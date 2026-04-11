@@ -2,89 +2,117 @@ pipeline {
   agent any
 
   environment {
-    DOCKERHUB_USER = "aakash985"
-    CUSTOMER_IMAGE    = "bitrush-customer:${BUILD_NUMBER}"
-    RESTAURANT_IMAGE  = "smartqueue-restaurant:${BUILD_NUMBER}"
-    CUSTOMER_PORT     = "5174"
-    RESTAURANT_PORT   = "5175"
-    API_URL           = "https://kkidytruee.execute-api.ap-southeast-1.amazonaws.com"
-    MASTER_KEY        = "MASTER-SMARTQUEUE-2024"
+    DOCKERHUB_USER   = "aakash985"   
+    CUSTOMER_IMAGE   = "${DOCKERHUB_USER}/bitrush-customer"
+    RESTAURANT_IMAGE = "${DOCKERHUB_USER}/smartqueue-restaurant"
+    IMAGE_TAG        = "${BUILD_NUMBER}"
+    K8S_NAMESPACE    = "smartqueue"
   }
 
   stages {
 
+    // ── 1. Checkout ──────────────────────────────────────────────────────────
     stage('Checkout') {
       steps {
         checkout scm
-        sh 'echo "Branch: $(git rev-parse --abbrev-ref HEAD) | Commit: $(git rev-parse --short HEAD)"'
+        sh 'git log --oneline -1'
       }
     }
 
-    stage('Build Docker Images') {
+    // ── 2. Build — secrets injected from Jenkins Credentials ─────────────────
+    stage('Build Images') {
       parallel {
 
         stage('customer-app') {
           steps {
-            sh """
-              docker build \\
-                --build-arg VITE_API_URL=${API_URL} \\
-                --build-arg VITE_MASTER_KEY=${MASTER_KEY} \\
-                -t ${CUSTOMER_IMAGE} \\
-                ./customer-app
-            """
+            // API_GATEWAY_URL and MASTER_KEY are stored in Jenkins Credentials
+            // They are NEVER in GitHub — Jenkins injects them here at build time
+            withCredentials([
+              string(credentialsId: 'API_GATEWAY_URL', variable: 'API_URL'),
+              string(credentialsId: 'MASTER_KEY',      variable: 'MKEY')
+            ]) {
+              sh """
+                docker build \\
+                  --build-arg VITE_API_URL=\${API_URL} \\
+                  --build-arg VITE_MASTER_KEY=\${MKEY} \\
+                  -t ${CUSTOMER_IMAGE}:${IMAGE_TAG} \\
+                  -t ${CUSTOMER_IMAGE}:latest \\
+                  ./customer-app
+              """
+            }
           }
         }
 
         stage('restaurant-app') {
           steps {
-            sh """
-              docker build \\
-                --build-arg VITE_API_URL=${API_URL} \\
-                --build-arg VITE_MASTER_KEY=${MASTER_KEY} \\
-                -t ${RESTAURANT_IMAGE} \\
-                ./restaurant-app
-            """
+            withCredentials([
+              string(credentialsId: 'API_GATEWAY_URL', variable: 'API_URL'),
+              string(credentialsId: 'MASTER_KEY',      variable: 'MKEY')
+            ]) {
+              sh """
+                docker build \\
+                  --build-arg VITE_API_URL=\${API_URL} \\
+                  --build-arg VITE_MASTER_KEY=\${MKEY} \\
+                  -t ${RESTAURANT_IMAGE}:${IMAGE_TAG} \\
+                  -t ${RESTAURANT_IMAGE}:latest \\
+                  ./restaurant-app
+              """
+            }
           }
         }
 
       }
     }
 
-    stage('Deploy Containers') {
+    // ── 3. Push to DockerHub ─────────────────────────────────────────────────
+    stage('Push to DockerHub') {
+      steps {
+        withCredentials([usernamePassword(
+          credentialsId: 'dockerhub-credentials',
+          usernameVariable: 'DOCKER_USER',
+          passwordVariable: 'DOCKER_PASS'
+        )]) {
+          sh """
+            echo "\${DOCKER_PASS}" | docker login -u "\${DOCKER_USER}" --password-stdin
+            docker push ${CUSTOMER_IMAGE}:${IMAGE_TAG}
+            docker push ${CUSTOMER_IMAGE}:latest
+            docker push ${RESTAURANT_IMAGE}:${IMAGE_TAG}
+            docker push ${RESTAURANT_IMAGE}:latest
+            docker logout
+          """
+        }
+      }
+    }
+
+    // ── 4. Deploy to Kubernetes ──────────────────────────────────────────────
+    stage('Deploy to Kubernetes') {
       steps {
         sh """
-          # Stop and remove old containers
-          docker rm -f bitrush-customer     || true
-          docker rm -f smartqueue-restaurant || true
+          kubectl apply -f k8s/namespace.yaml
 
-          # Start customer-app
-          docker run -d \\
-            --name bitrush-customer \\
-            --restart unless-stopped \\
-            -p ${CUSTOMER_PORT}:80 \\
-            ${CUSTOMER_IMAGE}
+          sed 's|DOCKERHUB_USER|${DOCKERHUB_USER}|g; s|IMAGE_TAG|${IMAGE_TAG}|g' \\
+            k8s/customer-app.yaml | kubectl apply -f -
 
-          # Start restaurant-app
-          docker run -d \\
-            --name smartqueue-restaurant \\
-            --restart unless-stopped \\
-            -p ${RESTAURANT_PORT}:80 \\
-            ${RESTAURANT_IMAGE}
+          sed 's|DOCKERHUB_USER|${DOCKERHUB_USER}|g; s|IMAGE_TAG|${IMAGE_TAG}|g' \\
+            k8s/restaurant-app.yaml | kubectl apply -f -
         """
       }
     }
 
-    stage('Health Check') {
+    // ── 5. Verify rollout ────────────────────────────────────────────────────
+    stage('Verify Rollout') {
       steps {
         sh """
-          sleep 5
-          curl -sf http://localhost:${CUSTOMER_PORT}   && echo "✅ customer-app  is UP"
-          curl -sf http://localhost:${RESTAURANT_PORT} && echo "✅ restaurant-app is UP"
+          kubectl rollout status deployment/customer-app   -n ${K8S_NAMESPACE} --timeout=120s
+          kubectl rollout status deployment/restaurant-app -n ${K8S_NAMESPACE} --timeout=120s
+          kubectl get pods -n ${K8S_NAMESPACE}
+          kubectl get svc  -n ${K8S_NAMESPACE}
         """
       }
     }
 
-    stage('Cleanup Old Images') {
+    // ── 6. Cleanup ───────────────────────────────────────────────────────────
+    stage('Cleanup') {
       steps {
         sh "docker image prune -f || true"
       }
@@ -94,20 +122,21 @@ pipeline {
 
   post {
     success {
-      echo """
-        ============================================
-        ✅  DEPLOYMENT SUCCESSFUL
-        --------------------------------------------
-        customer-app   → http://\$(curl -s ifconfig.me):${CUSTOMER_PORT}
-        restaurant-app → http://\$(curl -s ifconfig.me):${RESTAURANT_PORT}
-        ============================================
+      sh """
+        EC2_IP=\$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null || echo 'YOUR_EC2_IP')
+        echo "============================================"
+        echo "✅  BUILD #${BUILD_NUMBER} DEPLOYED"
+        echo "--------------------------------------------"
+        echo "customer-app   → http://\${EC2_IP}:30174"
+        echo "restaurant-app → http://\${EC2_IP}:30175"
+        echo "============================================"
       """
     }
     failure {
       sh """
         echo "❌ Build failed — rolling back"
-        docker rm -f bitrush-customer     || true
-        docker rm -f smartqueue-restaurant || true
+        kubectl rollout undo deployment/customer-app   -n ${K8S_NAMESPACE} || true
+        kubectl rollout undo deployment/restaurant-app -n ${K8S_NAMESPACE} || true
       """
     }
   }
