@@ -25,7 +25,7 @@ spec:
       containers:
         - name: restaurant-app
           image: DOCKERHUB_USER/smartqueue-restaurant:IMAGE_TAG
-          imagePullPolicy: Always
+          imagePullPolicy: Never
           ports:
             - containerPort: 80
           resources:
