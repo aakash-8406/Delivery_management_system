@@ -25,7 +25,7 @@ spec:
       containers:
         - name: customer-app
           image: DOCKERHUB_USER/bitrush-customer:IMAGE_TAG
-          imagePullPolicy: Always
+          imagePullPolicy: Never
           ports:
             - containerPort: 80
           resources:
