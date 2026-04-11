@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    DOCKERHUB_USER   = "aakash985"   
+    DOCKERHUB_USER   = "aakash985"
     CUSTOMER_IMAGE   = "${DOCKERHUB_USER}/bitrush-customer"
     RESTAURANT_IMAGE = "${DOCKERHUB_USER}/smartqueue-restaurant"
     IMAGE_TAG        = "${BUILD_NUMBER}"
@@ -11,7 +11,6 @@ pipeline {
 
   stages {
 
-    // ── 1. Checkout ──────────────────────────────────────────────────────────
     stage('Checkout') {
       steps {
         checkout scm
@@ -19,14 +18,12 @@ pipeline {
       }
     }
 
-    // ── 2. Build — secrets injected from Jenkins Credentials ─────────────────
+    // Build using host Docker, push to DockerHub, k3s pulls from there
     stage('Build Images') {
       parallel {
 
         stage('customer-app') {
           steps {
-            // API_GATEWAY_URL and MASTER_KEY are stored in Jenkins Credentials
-            // They are NEVER in GitHub — Jenkins injects them here at build time
             withCredentials([
               string(credentialsId: 'API_GATEWAY_URL', variable: 'API_URL'),
               string(credentialsId: 'MASTER_KEY',      variable: 'MKEY')
@@ -64,7 +61,6 @@ pipeline {
       }
     }
 
-    // ── 3. Push to DockerHub ─────────────────────────────────────────────────
     stage('Push to DockerHub') {
       steps {
         withCredentials([usernamePassword(
@@ -84,7 +80,6 @@ pipeline {
       }
     }
 
-    // ── 4. Deploy to Kubernetes ──────────────────────────────────────────────
     stage('Deploy to Kubernetes') {
       steps {
         sh """
@@ -99,19 +94,17 @@ pipeline {
       }
     }
 
-    // ── 5. Verify rollout ────────────────────────────────────────────────────
     stage('Verify Rollout') {
       steps {
         sh """
-          kubectl rollout status deployment/customer-app   -n ${K8S_NAMESPACE} --timeout=120s
-          kubectl rollout status deployment/restaurant-app -n ${K8S_NAMESPACE} --timeout=120s
+          kubectl rollout status deployment/customer-app   -n ${K8S_NAMESPACE} --timeout=300s
+          kubectl rollout status deployment/restaurant-app -n ${K8S_NAMESPACE} --timeout=300s
           kubectl get pods -n ${K8S_NAMESPACE}
           kubectl get svc  -n ${K8S_NAMESPACE}
         """
       }
     }
 
-    // ── 6. Cleanup ───────────────────────────────────────────────────────────
     stage('Cleanup') {
       steps {
         sh "docker image prune -f || true"
@@ -123,18 +116,16 @@ pipeline {
   post {
     success {
       sh """
-        EC2_IP=\$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null || echo 'YOUR_EC2_IP')
-        echo "============================================"
-        echo "✅  BUILD #${BUILD_NUMBER} DEPLOYED"
-        echo "--------------------------------------------"
-        echo "customer-app   → http://\${EC2_IP}:30174"
-        echo "restaurant-app → http://\${EC2_IP}:30175"
-        echo "============================================"
+        EC2_IP=\$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null)
+        echo "========================================"
+        echo "BUILD #${BUILD_NUMBER} DEPLOYED"
+        echo "customer-app   -> http://\${EC2_IP}:30174"
+        echo "restaurant-app -> http://\${EC2_IP}:30175"
+        echo "========================================"
       """
     }
     failure {
       sh """
-        echo "❌ Build failed — rolling back"
         kubectl rollout undo deployment/customer-app   -n ${K8S_NAMESPACE} || true
         kubectl rollout undo deployment/restaurant-app -n ${K8S_NAMESPACE} || true
       """
