@@ -2,6 +2,7 @@ pipeline {
   agent any
 
   environment {
+    DOCKERHUB_USER = "aakash985"
     CUSTOMER_IMAGE    = "bitrush-customer:${BUILD_NUMBER}"
     RESTAURANT_IMAGE  = "smartqueue-restaurant:${BUILD_NUMBER}"
     CUSTOMER_PORT     = "5174"
