@@ -5,6 +5,7 @@
  */
 
 import * as mock from './mockApi';
+import { saveRestaurant } from './restaurantStore';
 
 const BASE = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
 const USE_MOCK = !BASE;
@@ -31,8 +32,9 @@ const request = async (method, path, body) => {
 /** POST /register → { token, restaurant } */
 export const registerRestaurant = async (data) => {
   if (USE_MOCK) {
-    // mock: just return a fake session
-    return { token: 'mock-token', restaurant: { restaurantId: data.email, name: data.name, location: data.location ?? '', menu: [] } };
+    const restaurant = { restaurantId: data.email, name: data.name, location: data.location ?? '', cuisine: data.cuisine ?? '', rating: '', deliveryTime: '', deliveryFee: '', offer: '', isVeg: false, menu: [] };
+    saveRestaurant(restaurant);
+    return { token: 'mock-token', restaurant };
   }
   return request('POST', '/register', data);
 };
@@ -40,8 +42,11 @@ export const registerRestaurant = async (data) => {
 /** POST /login → { token, restaurant } */
 export const loginRestaurant = async (email, password) => {
   if (USE_MOCK) {
-    if (email === 'admin@smartqueue.com' && password === 'admin123')
-      return { token: 'mock-token', restaurant: { restaurantId: email, name: 'Demo Restaurant', menu: [] } };
+    if (email === 'admin@smartqueue.com' && password === 'admin123') {
+      const restaurant = { restaurantId: email, name: 'Demo Restaurant', menu: [] };
+      saveRestaurant(restaurant);
+      return { token: 'mock-token', restaurant };
+    }
     throw new Error('Invalid email or password');
   }
   return request('POST', '/login', { email, password });
@@ -68,7 +73,10 @@ export const updateOrder = async (id, status) => {
 
 /** PATCH /restaurants/{id} → restaurant */
 export const updateRestaurant = async (restaurantId, data) => {
-  if (USE_MOCK) return data;
+  if (USE_MOCK) {
+    saveRestaurant({ restaurantId, ...data });
+    return data;
+  }
   return request('PATCH', `/restaurants/${restaurantId}`, data);
 };
 
