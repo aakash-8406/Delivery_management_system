@@ -39,6 +39,27 @@ pipeline {
             # Wait for table to be active
             aws dynamodb wait table-exists --table-name Users --region \${AWS_DEFAULT_REGION} || true
 
+            # Grant Lambda role access to Users table
+            ACCOUNT_ID=\$(aws sts get-caller-identity --query Account --output text)
+            POLICY_ARN="arn:aws:iam::\${ACCOUNT_ID}:policy/smartqueue-users-table-policy"
+
+            # Create policy if not exists
+            aws iam create-policy \\
+              --policy-name smartqueue-users-table-policy \\
+              --policy-document '{
+                "Version":"2012-10-17",
+                "Statement":[{
+                  "Effect":"Allow",
+                  "Action":["dynamodb:PutItem","dynamodb:GetItem","dynamodb:UpdateItem","dynamodb:DeleteItem","dynamodb:Scan","dynamodb:Query"],
+                  "Resource":"arn:aws:dynamodb:'\${AWS_DEFAULT_REGION}':'\${ACCOUNT_ID}':table/Users"
+                }]
+              }' 2>/dev/null || true
+
+            # Attach policy to Lambda exec role
+            aws iam attach-role-policy \\
+              --role-name smartqueue-lambda-exec-role \\
+              --policy-arn "arn:aws:iam::\${ACCOUNT_ID}:policy/smartqueue-users-table-policy" 2>/dev/null || true
+
             # Update Lambda env vars to include USERS_TABLE
             aws lambda update-function-configuration \\
               --function-name smartqueue-register \\
