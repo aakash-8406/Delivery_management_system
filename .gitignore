@@ -3,6 +3,9 @@ dist
 dist-ssr
 *.local
 
+.terraform/
+*.tfstate
+*.tfstate.backup
 # Logs
 logs
 *.log
