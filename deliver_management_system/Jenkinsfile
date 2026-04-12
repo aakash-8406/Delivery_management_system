@@ -65,19 +65,21 @@ pipeline {
     // ── 3. Push to DockerHub ─────────────────────────────────────────────────
     stage('Push to DockerHub') {
       steps {
-        withCredentials([usernamePassword(
-          credentialsId: 'dockerhub-credentials',
-          usernameVariable: 'DOCKER_USER',
-          passwordVariable: 'DOCKER_PASS'
-        )]) {
-          sh """
-            echo "\${DOCKER_PASS}" | docker login -u "\${DOCKER_USER}" --password-stdin
-            docker push ${CUSTOMER_IMAGE}:${IMAGE_TAG}
-            docker push ${CUSTOMER_IMAGE}:latest
-            docker push ${RESTAURANT_IMAGE}:${IMAGE_TAG}
-            docker push ${RESTAURANT_IMAGE}:latest
-            docker logout
-          """
+        retry(3) {
+          withCredentials([usernamePassword(
+            credentialsId: 'dockerhub-credentials',
+            usernameVariable: 'DOCKER_USER',
+            passwordVariable: 'DOCKER_PASS'
+          )]) {
+            sh """
+              echo "\${DOCKER_PASS}" | docker login -u "\${DOCKER_USER}" --password-stdin
+              docker push ${CUSTOMER_IMAGE}:${IMAGE_TAG}
+              docker push ${CUSTOMER_IMAGE}:latest
+              docker push ${RESTAURANT_IMAGE}:${IMAGE_TAG}
+              docker push ${RESTAURANT_IMAGE}:latest
+              docker logout
+            """
+          }
         }
       }
     }
