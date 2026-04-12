@@ -41,13 +41,13 @@ export const getRestaurants = async (params = {}) => {
   return {
     data: list.map(r => ({
       ...r,
-      id:           r.id ?? r.restaurantId,
+      id:           r.restaurantId ?? r.id,
       image:        r.image        || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=250&fit=crop',
       cuisine:      r.cuisine      || r.location || 'Restaurant',
-      rating:       r.rating       ?? 4.5,
-      deliveryTime: r.deliveryTime ?? '30-40 min',
-      deliveryFee:  r.deliveryFee  ?? 29,
-      offer:        r.offer        ?? '',
+      rating:       r.rating       != null ? Number(r.rating)       : 4.5,
+      deliveryTime: r.deliveryTime || '30-40 min',
+      deliveryFee:  r.deliveryFee  != null && r.deliveryFee !== '' ? Number(r.deliveryFee) : 29,
+      offer:        r.offer        || '',
       isVeg:        r.isVeg        ?? false,
     })),
   };

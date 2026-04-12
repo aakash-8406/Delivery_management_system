@@ -19,7 +19,27 @@ pipeline {
       }
     }
 
-    // ── 2. Build — secrets injected from Jenkins Credentials ─────────────────
+    // ── 2. Deploy Lambda — update getRestaurants with latest code ────────────
+    stage('Deploy Lambda') {
+      steps {
+        withCredentials([
+          string(credentialsId: 'AWS_ACCESS_KEY_ID',     variable: 'AWS_ACCESS_KEY_ID'),
+          string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
+          string(credentialsId: 'AWS_REGION',            variable: 'AWS_DEFAULT_REGION')
+        ]) {
+          sh """
+            cd deliver_management_system/infra/lambda/getRestaurants
+            zip -j getRestaurants.zip index.mjs
+            aws lambda update-function-code \\
+              --function-name smartqueue-getRestaurants \\
+              --zip-file fileb://getRestaurants.zip
+            rm getRestaurants.zip
+          """
+        }
+      }
+    }
+
+    // ── 3. Build — secrets injected from Jenkins Credentials ─────────────────
     stage('Build Images') {
       parallel {
 
@@ -62,7 +82,7 @@ pipeline {
       }
     }
 
-    // ── 3. Push to DockerHub ─────────────────────────────────────────────────
+    // ── 4. Push to DockerHub ─────────────────────────────────────────────────
     stage('Push to DockerHub') {
       steps {
         retry(3) {
@@ -84,7 +104,7 @@ pipeline {
       }
     }
 
-    // ── 4. Deploy to Kubernetes ──────────────────────────────────────────────
+    // ── 5. Deploy to Kubernetes ──────────────────────────────────────────────
     stage('Deploy to Kubernetes') {
       steps {
         sh """
@@ -99,7 +119,7 @@ pipeline {
       }
     }
 
-    // ── 5. Verify rollout ────────────────────────────────────────────────────
+    // ── 6. Verify rollout ────────────────────────────────────────────────────
     stage('Verify Rollout') {
       steps {
         sh """
@@ -111,7 +131,7 @@ pipeline {
       }
     }
 
-    // ── 6. Cleanup ───────────────────────────────────────────────────────────
+    // ── 7. Cleanup ───────────────────────────────────────────────────────────
     stage('Cleanup') {
       steps {
         sh "docker image prune -f || true"
