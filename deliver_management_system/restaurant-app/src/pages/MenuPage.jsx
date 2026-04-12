@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
-import { Plus, Trash2, Pencil, Check, X, Loader2, UtensilsCrossed, ImagePlus, Store } from 'lucide-react';
+import { Plus, Trash2, Pencil, Check, X, Loader2, UtensilsCrossed, ImagePlus, Store, Star, Clock, Bike, Tag, Leaf } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { updateRestaurant } from '../services/api';
 
@@ -45,6 +45,35 @@ export default function MenuPage() {
   const [coverPreview, setCoverPreview] = useState(user?.image ?? '');
   const coverRef = useRef();
   const itemImgRef = useRef();
+
+  // Restaurant details
+  const [detailsEdit, setDetailsEdit] = useState(false);
+  const [detailsSaving, setDetailsSaving] = useState(false);
+  const [details, setDetails] = useState({
+    cuisine:      user?.cuisine      ?? '',
+    rating:       user?.rating       ?? '',
+    deliveryTime: user?.deliveryTime ?? '',
+    deliveryFee:  user?.deliveryFee  ?? '',
+    offer:        user?.offer        ?? '',
+    isVeg:        user?.isVeg        ?? false,
+  });
+
+  const saveDetails = async () => {
+    setDetailsSaving(true);
+    try {
+      const payload = {
+        ...details,
+        rating:      details.rating      !== '' ? parseFloat(details.rating)  : undefined,
+        deliveryFee: details.deliveryFee !== '' ? parseFloat(details.deliveryFee) : undefined,
+      };
+      await updateRestaurant(user.restaurantId, payload);
+      setSession({ ...user, ...payload }, localStorage.getItem('sq_token'));
+      setDetailsEdit(false);
+      toast.success('Restaurant details updated');
+    } catch (err) {
+      toast.error(err.message ?? 'Failed to save details');
+    } finally { setDetailsSaving(false); }
+  };
 
   useEffect(() => { setMenu(user?.menu ?? []); }, [user]);
 
@@ -174,6 +203,116 @@ export default function MenuPage() {
           </button>
           <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverFile} />
         </div>
+      </div>
+
+      {/* Restaurant Details */}
+      <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold text-sm">Restaurant Details</h2>
+          {!detailsEdit ? (
+            <button onClick={() => setDetailsEdit(true)}
+              className="flex items-center gap-1.5 text-xs text-[var(--primary)] hover:underline font-medium">
+              <Pencil size={12} /> Edit
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button onClick={() => setDetailsEdit(false)}
+                className="flex items-center gap-1 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 py-1 rounded-lg border border-[var(--border)] hover:bg-[var(--muted)]">
+                <X size={12} /> Cancel
+              </button>
+              <button onClick={saveDetails} disabled={detailsSaving}
+                className="flex items-center gap-1 text-xs text-white bg-[var(--primary)] px-2 py-1 rounded-lg hover:opacity-90 disabled:opacity-50">
+                {detailsSaving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Save
+              </button>
+            </div>
+          )}
+        </div>
+
+        {!detailsEdit ? (
+          /* View mode */
+          <div className="flex flex-wrap gap-3">
+            {details.cuisine && (
+              <span className="flex items-center gap-1.5 text-xs bg-[var(--muted)] px-3 py-1.5 rounded-full text-[var(--foreground)]">
+                <Store size={11} /> {details.cuisine}
+              </span>
+            )}
+            {details.rating && (
+              <span className="flex items-center gap-1.5 text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-full font-semibold">
+                <Star size={11} fill="currentColor" /> {details.rating}
+              </span>
+            )}
+            {details.deliveryTime && (
+              <span className="flex items-center gap-1.5 text-xs bg-[var(--muted)] px-3 py-1.5 rounded-full text-[var(--foreground)]">
+                <Clock size={11} /> {details.deliveryTime}
+              </span>
+            )}
+            {details.deliveryFee !== '' && (
+              <span className="flex items-center gap-1.5 text-xs bg-[var(--muted)] px-3 py-1.5 rounded-full text-[var(--foreground)]">
+                <Bike size={11} /> {Number(details.deliveryFee) === 0 ? 'Free delivery' : `₹${details.deliveryFee} delivery`}
+              </span>
+            )}
+            {details.offer && (
+              <span className="flex items-center gap-1.5 text-xs bg-orange-100 text-orange-700 px-3 py-1.5 rounded-full font-semibold">
+                <Tag size={11} /> {details.offer}
+              </span>
+            )}
+            {details.isVeg && (
+              <span className="flex items-center gap-1.5 text-xs bg-green-600 text-white px-3 py-1.5 rounded-full font-semibold">
+                <Leaf size={11} /> Pure Veg
+              </span>
+            )}
+            {!details.cuisine && !details.rating && !details.deliveryTime && details.deliveryFee === '' && !details.offer && !details.isVeg && (
+              <p className="text-xs text-[var(--muted-foreground)] italic">No details added yet. Click Edit to fill in.</p>
+            )}
+          </div>
+        ) : (
+          /* Edit mode */
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium mb-1 text-[var(--muted-foreground)]">Cuisine</label>
+              <input type="text" value={details.cuisine}
+                onChange={e => setDetails(d => ({ ...d, cuisine: e.target.value }))}
+                placeholder="e.g. Indian, Biryani, Curry"
+                className="w-full px-3 py-2 rounded-lg border border-[var(--input)] bg-[var(--background)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1 text-[var(--muted-foreground)]">Rating (0–5)</label>
+              <input type="number" value={details.rating} min="0" max="5" step="0.1"
+                onChange={e => setDetails(d => ({ ...d, rating: e.target.value }))}
+                placeholder="e.g. 4.5"
+                className="w-full px-3 py-2 rounded-lg border border-[var(--input)] bg-[var(--background)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1 text-[var(--muted-foreground)]">Delivery Time</label>
+              <input type="text" value={details.deliveryTime}
+                onChange={e => setDetails(d => ({ ...d, deliveryTime: e.target.value }))}
+                placeholder="e.g. 30-40 min"
+                className="w-full px-3 py-2 rounded-lg border border-[var(--input)] bg-[var(--background)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1 text-[var(--muted-foreground)]">Delivery Fee (₹)</label>
+              <input type="number" value={details.deliveryFee} min="0"
+                onChange={e => setDetails(d => ({ ...d, deliveryFee: e.target.value }))}
+                placeholder="0 for free delivery"
+                className="w-full px-3 py-2 rounded-lg border border-[var(--input)] bg-[var(--background)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]" />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-medium mb-1 text-[var(--muted-foreground)]">Offer</label>
+              <input type="text" value={details.offer}
+                onChange={e => setDetails(d => ({ ...d, offer: e.target.value }))}
+                placeholder="e.g. 50% OFF up to ₹100, Free Delivery"
+                className="w-full px-3 py-2 rounded-lg border border-[var(--input)] bg-[var(--background)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]" />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="flex items-center gap-2 cursor-pointer text-sm">
+                <input type="checkbox" checked={details.isVeg}
+                  onChange={e => setDetails(d => ({ ...d, isVeg: e.target.checked }))}
+                  className="w-4 h-4 accent-green-600" />
+                Pure Vegetarian Restaurant
+              </label>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Menu Header */}
