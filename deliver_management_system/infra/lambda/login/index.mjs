@@ -28,9 +28,16 @@ export const handler = async (event) => {
     if (!email || !password)
       return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "email and password are required" }) };
 
+    if (!TABLE)
+      return { statusCode: 500, headers: cors, body: JSON.stringify({ error: "Server misconfiguration: RESTAURANTS_TABLE not set" }) };
+
     const { Item } = await client.send(new GetCommand({ TableName: TABLE, Key: { restaurantId: email } }));
-    if (!Item || Item.password !== hashPassword(password))
-      return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "Invalid email or password" }) };
+
+    if (!Item)
+      return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "No account found with this email. Please register first." }) };
+
+    if (Item.password !== hashPassword(password))
+      return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "Incorrect password. Please try again." }) };
 
     const token = makeToken({ restaurantId: Item.restaurantId, name: Item.name });
     const { password: _, ...safe } = Item;

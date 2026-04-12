@@ -19,7 +19,7 @@ pipeline {
       }
     }
 
-    // ── 2. Deploy Lambda — update getRestaurants with latest code ────────────
+    // ── 2. Deploy Lambda — update getRestaurants and login with latest code ──
     stage('Deploy Lambda') {
       steps {
         withCredentials([
@@ -28,12 +28,29 @@ pipeline {
           string(credentialsId: 'AWS_REGION',            variable: 'AWS_DEFAULT_REGION')
         ]) {
           sh """
+            # Deploy getRestaurants
             cd deliver_management_system/infra/lambda/getRestaurants
             zip -j getRestaurants.zip index.mjs
             aws lambda update-function-code \\
               --function-name smartqueue-getRestaurants \\
               --zip-file fileb://getRestaurants.zip
             rm getRestaurants.zip
+
+            # Deploy login
+            cd ../login
+            zip -j login.zip index.mjs
+            aws lambda update-function-code \\
+              --function-name smartqueue-login \\
+              --zip-file fileb://login.zip
+            rm login.zip
+
+            # Deploy register
+            cd ../register
+            zip -j register.zip index.mjs
+            aws lambda update-function-code \\
+              --function-name smartqueue-register \\
+              --zip-file fileb://register.zip
+            rm register.zip
           """
         }
       }
