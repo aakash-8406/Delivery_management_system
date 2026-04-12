@@ -14,8 +14,8 @@ export const handler = async () => {
   try {
     const { Items = [] } = await client.send(new ScanCommand({
       TableName: TABLE,
-      ProjectionExpression: "restaurantId, #n, #l, menu, #img, createdAt",
-      ExpressionAttributeNames: { "#n": "name", "#l": "location", "#img": "image" },
+      ProjectionExpression: "restaurantId, #n, #l, menu, #img, createdAt, cuisine, rating, deliveryTime, deliveryFee, #offer, isVeg",
+      ExpressionAttributeNames: { "#n": "name", "#l": "location", "#img": "image", "#offer": "offer" },
     }));
     return { statusCode: 200, headers: cors, body: JSON.stringify({ data: Items }) };
   } catch (err) {
