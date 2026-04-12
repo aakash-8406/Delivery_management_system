@@ -35,7 +35,7 @@ pipeline {
                   --build-arg VITE_MASTER_KEY=\${MKEY} \\
                   -t ${CUSTOMER_IMAGE}:${IMAGE_TAG} \\
                   -t ${CUSTOMER_IMAGE}:latest \\
-                  ./customers-app
+                  ./deliver_management_system/customers-app
               """
             }
           }
@@ -53,7 +53,7 @@ pipeline {
                   --build-arg VITE_MASTER_KEY=\${MKEY} \\
                   -t ${RESTAURANT_IMAGE}:${IMAGE_TAG} \\
                   -t ${RESTAURANT_IMAGE}:latest \\
-                  ./restaurant-app
+                  ./deliver_management_system/restaurant-app
               """
             }
           }
@@ -86,13 +86,13 @@ pipeline {
     stage('Deploy to Kubernetes') {
       steps {
         sh """
-          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f deliver_management_system/k8s/namespace.yaml
 
           sed 's|DOCKERHUB_USER|${DOCKERHUB_USER}|g; s|IMAGE_TAG|${IMAGE_TAG}|g' \\
-            k8s/customer-app.yaml | kubectl apply -f -
+            deliver_management_system/k8s/customer-app.yaml | kubectl apply -f -
 
           sed 's|DOCKERHUB_USER|${DOCKERHUB_USER}|g; s|IMAGE_TAG|${IMAGE_TAG}|g' \\
-            k8s/restaurant-app.yaml | kubectl apply -f -
+            deliver_management_system/k8s/restaurant-app.yaml | kubectl apply -f -
         """
       }
     }
