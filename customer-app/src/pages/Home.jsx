@@ -4,7 +4,7 @@ import RestaurantCard from '../components/RestaurantCard';
 import Loader from '../components/Loader';
 import { getRestaurants, searchRestaurants } from '../services/api';
 
-const CATEGORIES = ['All', 'Burgers', 'Pizza', 'Indian', 'Healthy', 'Sushi', 'Desserts', 'Mexican'];
+const CATEGORIES = ['All', 'Burgers', 'Pizza', 'Indian', 'Healthy', 'Sushi', 'Desserts', 'Mexican','Fast Foods'];
 
 const Home = () => {
   const [restaurants, setRestaurants] = useState([]);
