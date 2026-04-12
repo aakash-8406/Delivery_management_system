@@ -28,7 +28,7 @@ variable "users_table_name" {
   default     = "Users"
 }
 
-
+variable "lambda_runtime" {
   description = "Lambda runtime"
   type        = string
   default     = "nodejs20.x"
