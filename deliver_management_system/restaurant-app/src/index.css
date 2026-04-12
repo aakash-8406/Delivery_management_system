@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+/* ── Blue & White theme ── */
+:root {
+  --background: #f0f6ff;
+  --foreground: #0a1628;
+  --card: #ffffff;
+  --primary: #1d6bf3;
+  --primary-foreground: #ffffff;
+  --secondary: #e8f0fe;
+  --secondary-foreground: #1a4db8;
+  --muted: #eaf1ff;
+  --muted-foreground: #5a7299;
+  --border: #d0e2ff;
+  --input: #ddeaff;
+  --ring: #1d6bf3;
+}
+
+.dark {
+  --background: #060d1a;
+  --foreground: #e2eaf8;
+  --card: #0c1628;
+  --primary: #4d9fff;
+  --primary-foreground: #060d1a;
+  --secondary: #0f1f3d;
+  --secondary-foreground: #93c5fd;
+  --muted: #0d1a30;
+  --muted-foreground: #6b8ab5;
+  --border: #162540;
+  --input: #0f1f3d;
+  --ring: #4d9fff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(29,107,243,0.09) 0%, transparent 70%);
+  min-height: 100vh;
+}
+
+.dark body {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(77,159,255,0.12) 0%, transparent 70%);
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.glass {
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.55);
+}
+.dark .glass {
+  background: rgba(12,22,40,0.78);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(77,159,255,0.1);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #1d6bf3 0%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.auth-bg {
+  background:
+    radial-gradient(ellipse 70% 60% at 15% 40%, rgba(29,107,243,0.13) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 85% 15%, rgba(56,189,248,0.10) 0%, transparent 65%),
+    var(--background);
+}
