@@ -36,7 +36,21 @@ const request = async (method, path, body) => {
 
 export const getRestaurants = async (params = {}) => {
   if (!HAS_BACKEND) return mock.getRestaurants(params);
-  return request('GET', '/restaurants');
+  const res = await request('GET', '/restaurants');
+  const list = Array.isArray(res.data) ? res.data : [];
+  return {
+    data: list.map(r => ({
+      ...r,
+      id:           r.id ?? r.restaurantId,
+      image:        r.image        || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=250&fit=crop',
+      cuisine:      r.cuisine      || r.location || 'Restaurant',
+      rating:       r.rating       ?? 4.5,
+      deliveryTime: r.deliveryTime ?? '30-40 min',
+      deliveryFee:  r.deliveryFee  ?? 29,
+      offer:        r.offer        ?? '',
+      isVeg:        r.isVeg        ?? false,
+    })),
+  };
 };
 
 export const searchRestaurants = (query) => mock.searchRestaurants(query); // local filter
@@ -47,7 +61,7 @@ export const getRestaurantById = async (id) => {
     const json = await res.json();
     const r = json.data ?? json;
     // Normalize to match mock shape expected by Menu.jsx
-    return { data: { ...r, id: r.restaurantId, image: r.image ?? 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=250&fit=crop', rating: r.rating ?? 4.5, deliveryTime: r.deliveryTime ?? '30-40 min', deliveryFee: r.deliveryFee ?? 29, cuisine: r.location ?? 'Restaurant' } };
+    return { data: { ...r, id: r.restaurantId ?? r.id, image: r.image ?? 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=250&fit=crop', rating: r.rating ?? 4.5, deliveryTime: r.deliveryTime ?? '30-40 min', deliveryFee: r.deliveryFee ?? 29, cuisine: r.cuisine || r.location || 'Restaurant', offer: r.offer ?? '', isVeg: r.isVeg ?? false } };
   } catch { return mock.getRestaurantById(id); }
 };
 

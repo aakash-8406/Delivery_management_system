@@ -24,15 +24,7 @@ const Home = () => {
     setLoading(true); setError(null);
     try {
       const { data } = await getRestaurants();
-      const normalized = (Array.isArray(data) ? data : []).map(r => ({
-        ...r,
-        id: r.id ?? r.restaurantId,
-        image: r.image || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=250&fit=crop',
-        cuisine: r.cuisine || r.location || 'Restaurant',
-        rating: r.rating ?? 4.5,
-        deliveryTime: r.deliveryTime ?? '30-40 min',
-        deliveryFee: r.deliveryFee ?? 29,
-      }));
+      const normalized = Array.isArray(data) ? data : [];
       setRestaurants(normalized);
       setFilteredResults(normalized);
     } catch (err) { setError(err.message); }
