@@ -2,9 +2,10 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { createHash, createHmac } from "crypto";
 
-const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
-const TABLE  = process.env.RESTAURANTS_TABLE;
-const SECRET = process.env.JWT_SECRET ?? "smartqueue-secret";
+const client      = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+const USERS_TABLE = process.env.USERS_TABLE;         // credentials table
+const REST_TABLE  = process.env.RESTAURANTS_TABLE;   // restaurant profile table
+const SECRET      = process.env.JWT_SECRET ?? "smartqueue-secret";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -12,7 +13,7 @@ const cors = {
   "Content-Type": "application/json",
 };
 
-// Must match register — plain SHA-256, no secret key
+// Must match register — plain SHA-256
 const hashPassword = (pw) => createHash("sha256").update(pw).digest("hex");
 
 const makeToken = (payload) => {
@@ -29,28 +30,31 @@ export const handler = async (event) => {
     if (!email || !password)
       return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "email and password are required" }) };
 
-    // Fetch user from DynamoDB
-    const { Item } = await client.send(
-      new GetCommand({ TableName: TABLE, Key: { restaurantId: email } })
+    // Step 1: Look up credentials in Users table
+    const { Item: user } = await client.send(
+      new GetCommand({ TableName: USERS_TABLE, Key: { email } })
     );
 
-    // User not found
-    if (!Item)
+    if (!user)
       return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "No account found with this email" }) };
 
-    // Wrong password
-    if (Item.password !== hashPassword(password))
+    if (user.password !== hashPassword(password))
       return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "Incorrect password" }) };
 
-    // Generate JWT token
-    const token = makeToken({ restaurantId: Item.restaurantId, name: Item.name });
+    // Step 2: Fetch restaurant profile from Restaurants table
+    const { Item: restaurant } = await client.send(
+      new GetCommand({ TableName: REST_TABLE, Key: { restaurantId: user.restaurantId } })
+    );
 
-    // Return restaurant data without password
-    const { password: _, ...safe } = Item;
+    if (!restaurant)
+      return { statusCode: 404, headers: cors, body: JSON.stringify({ error: "Restaurant profile not found" }) };
+
+    const token = makeToken({ restaurantId: restaurant.restaurantId, name: restaurant.name });
+
     return {
       statusCode: 200,
       headers: cors,
-      body: JSON.stringify({ data: { token, restaurant: safe } }),
+      body: JSON.stringify({ data: { token, restaurant } }),
     };
   } catch (err) {
     console.error("Login error:", err);

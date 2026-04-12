@@ -22,7 +22,13 @@ variable "restaurants_table_name" {
   default     = "Restaurants"
 }
 
-variable "lambda_runtime" {
+variable "users_table_name" {
+  description = "DynamoDB users table name (for restaurant owner login)"
+  type        = string
+  default     = "Users"
+}
+
+
   description = "Lambda runtime"
   type        = string
   default     = "nodejs20.x"
