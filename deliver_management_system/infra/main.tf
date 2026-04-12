@@ -40,17 +40,6 @@ resource "aws_dynamodb_table" "restaurants" {
   tags = { Project = var.project }
 }
 
-resource "aws_dynamodb_table" "users" {
-  name         = var.users_table_name
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "email"
-  attribute {
-    name = "email"
-    type = "S"
-  }
-  tags = { Project = var.project }
-}
-
 # ─── IAM ──────────────────────────────────────────────────────────────────────
 
 resource "aws_iam_role" "lambda_exec" {
@@ -84,8 +73,7 @@ resource "aws_iam_role_policy" "dynamodb_access" {
       ]
       Resource = [
         aws_dynamodb_table.orders.arn,
-        aws_dynamodb_table.restaurants.arn,
-        aws_dynamodb_table.users.arn
+        aws_dynamodb_table.restaurants.arn
       ]
     }]
   })
@@ -104,11 +92,6 @@ locals {
     RESTAURANTS_TABLE = aws_dynamodb_table.restaurants.name
     JWT_SECRET        = var.jwt_secret
     MASTER_KEY        = var.master_key
-  }
-  auth_env = {
-    USERS_TABLE       = aws_dynamodb_table.users.name
-    RESTAURANTS_TABLE = aws_dynamodb_table.restaurants.name
-    JWT_SECRET        = var.jwt_secret
   }
 }
 
@@ -202,7 +185,7 @@ resource "aws_lambda_function" "register" {
   handler          = "index.handler"
   filename         = data.archive_file.register_zip.output_path
   source_code_hash = data.archive_file.register_zip.output_base64sha256
-  environment { variables = local.auth_env }
+  environment { variables = local.restaurants_env }
   tags = { Project = var.project }
 }
 
@@ -213,7 +196,7 @@ resource "aws_lambda_function" "login" {
   handler          = "index.handler"
   filename         = data.archive_file.login_zip.output_path
   source_code_hash = data.archive_file.login_zip.output_base64sha256
-  environment { variables = local.auth_env }
+  environment { variables = local.restaurants_env }
   tags = { Project = var.project }
 }
 
