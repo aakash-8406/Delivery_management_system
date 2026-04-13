@@ -40,6 +40,17 @@ resource "aws_dynamodb_table" "restaurants" {
   tags = { Project = var.project }
 }
 
+resource "aws_dynamodb_table" "customers" {
+  name         = var.customers_table_name
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "email"
+  attribute {
+    name = "email"
+    type = "S"
+  }
+  tags = { Project = var.project }
+}
+
 resource "aws_dynamodb_table" "users" {
   name         = var.users_table_name
   billing_mode = "PAY_PER_REQUEST"
@@ -85,7 +96,8 @@ resource "aws_iam_role_policy" "dynamodb_access" {
       Resource = [
         aws_dynamodb_table.orders.arn,
         aws_dynamodb_table.restaurants.arn,
-        aws_dynamodb_table.users.arn
+        aws_dynamodb_table.users.arn,
+        aws_dynamodb_table.customers.arn
       ]
     }]
   })
@@ -105,11 +117,25 @@ locals {
     RESTAURANTS_TABLE = aws_dynamodb_table.restaurants.name
     JWT_SECRET        = var.jwt_secret
   }
+  customer_auth_env = {
+    CUSTOMERS_TABLE = aws_dynamodb_table.customers.name
+  }
   restaurants_env = {
     RESTAURANTS_TABLE = aws_dynamodb_table.restaurants.name
     JWT_SECRET        = var.jwt_secret
     MASTER_KEY        = var.master_key
   }
+}
+
+data "archive_file" "customer_register_zip" {
+  type        = "zip"
+  source_file = "${path.module}/lambda/customerRegister/index.mjs"
+  output_path = "${path.module}/.build/customerRegister.zip"
+}
+data "archive_file" "customer_login_zip" {
+  type        = "zip"
+  source_file = "${path.module}/lambda/customerLogin/index.mjs"
+  output_path = "${path.module}/.build/customerLogin.zip"
 }
 
 # ─── Lambda zips ──────────────────────────────────────────────────────────────
@@ -506,4 +532,76 @@ resource "aws_lambda_permission" "update_restaurant" {
   function_name = aws_lambda_function.update_restaurant.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${local.api_arn_prefix}/restaurants/*"
+}
+
+# ─── Customer Auth Lambdas ────────────────────────────────────────────────────
+
+resource "aws_lambda_function" "customer_register" {
+  function_name    = "${var.project}-customerRegister"
+  role             = aws_iam_role.lambda_exec.arn
+  runtime          = var.lambda_runtime
+  handler          = "index.handler"
+  filename         = data.archive_file.customer_register_zip.output_path
+  source_code_hash = data.archive_file.customer_register_zip.output_base64sha256
+  environment { variables = local.customer_auth_env }
+  tags = { Project = var.project }
+}
+
+resource "aws_lambda_function" "customer_login" {
+  function_name    = "${var.project}-customerLogin"
+  role             = aws_iam_role.lambda_exec.arn
+  runtime          = var.lambda_runtime
+  handler          = "index.handler"
+  filename         = data.archive_file.customer_login_zip.output_path
+  source_code_hash = data.archive_file.customer_login_zip.output_base64sha256
+  environment { variables = local.customer_auth_env }
+  tags = { Project = var.project }
+}
+
+resource "aws_cloudwatch_log_group" "customer_register" {
+  name              = "/aws/lambda/${aws_lambda_function.customer_register.function_name}"
+  retention_in_days = 7
+}
+resource "aws_cloudwatch_log_group" "customer_login" {
+  name              = "/aws/lambda/${aws_lambda_function.customer_login.function_name}"
+  retention_in_days = 7
+}
+
+resource "aws_apigatewayv2_integration" "customer_register" {
+  api_id                 = aws_apigatewayv2_api.main.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.customer_register.invoke_arn
+  payload_format_version = "2.0"
+}
+resource "aws_apigatewayv2_integration" "customer_login" {
+  api_id                 = aws_apigatewayv2_api.main.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.customer_login.invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_route" "customer_register" {
+  api_id    = aws_apigatewayv2_api.main.id
+  route_key = "POST /customerRegister"
+  target    = "integrations/${aws_apigatewayv2_integration.customer_register.id}"
+}
+resource "aws_apigatewayv2_route" "customer_login" {
+  api_id    = aws_apigatewayv2_api.main.id
+  route_key = "POST /customerLogin"
+  target    = "integrations/${aws_apigatewayv2_integration.customer_login.id}"
+}
+
+resource "aws_lambda_permission" "customer_register" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.customer_register.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${local.api_arn_prefix}/customerRegister"
+}
+resource "aws_lambda_permission" "customer_login" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.customer_login.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${local.api_arn_prefix}/customerLogin"
 }

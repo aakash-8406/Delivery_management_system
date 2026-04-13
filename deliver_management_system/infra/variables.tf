@@ -18,6 +18,11 @@ variable "restaurants_table_name" {
   default = "Restaurants"
 }
 
+variable "customers_table_name" {
+  type    = string
+  default = "Customers"
+}
+
 variable "users_table_name" {
   type    = string
   default = "Users"

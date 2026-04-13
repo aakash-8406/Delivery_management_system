@@ -78,10 +78,18 @@ export const getMenuByRestaurant = async (id) => {
   } catch { return mock.getMenuByRestaurant(id); }
 };
 
-// ─── Auth — always mock ───────────────────────────────────────────────────────
+// ─── Auth — real API when backend configured ─────────────────────────────────
 
-export const loginUser = (credentials) => mock.loginUser(credentials);
-export const registerUser = (userData) => mock.registerUser(userData);
+export const loginUser = async (credentials) => {
+  if (!HAS_BACKEND) return mock.loginUser(credentials);
+  return request('POST', '/customerLogin', credentials);
+};
+
+export const registerUser = async (userData) => {
+  if (!HAS_BACKEND) return mock.registerUser(userData);
+  return request('POST', '/customerRegister', userData);
+};
+
 export const forgotPassword = (email) => mock.forgotPassword(email);
 export const resetPassword = (token, password) => mock.resetPassword(token, password);
 
