@@ -18,6 +18,11 @@ variable "restaurants_table_name" {
   default = "Restaurants"
 }
 
+variable "users_table_name" {
+  type    = string
+  default = "Users"
+}
+
 variable "lambda_runtime" {
   type    = string
   default = "nodejs20.x"
