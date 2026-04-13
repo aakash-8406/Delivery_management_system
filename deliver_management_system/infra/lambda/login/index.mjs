@@ -25,8 +25,8 @@ const makeToken = (payload) => {
 
 export const handler = async (event) => {
   try {
-    const { email, password } = JSON.parse(event.body ?? "{}");
-
+    const { email: rawEmail, password } = JSON.parse(event.body ?? "{}");
+    const email = rawEmail?.toLowerCase().trim();
     if (!email || !password)
       return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "email and password required" }) };
 
