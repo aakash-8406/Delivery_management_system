@@ -19,8 +19,8 @@ const MyOrders = () => {
   const load = async () => {
     setLoading(true);
     try {
-      const { data } = await getUserOrders(user?.id);
-      // Show only this user's orders if name matches, else show all (demo mode)
+      const userId = user?.userId ?? user?.id;
+      const { data } = await getUserOrders(userId);
       setOrders(Array.isArray(data) ? data : []);
     } catch { setOrders([]); }
     finally { setLoading(false); }

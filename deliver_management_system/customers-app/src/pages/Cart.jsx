@@ -34,7 +34,7 @@ const Cart = () => {
     try {
       const deliveryAddress = `${address.line1.trim()}, ${address.city.trim()} - ${address.pincode.trim()}`;
       const { data } = await placeOrder({
-        userId: user?.id,
+        userId: user?.userId ?? user?.id,
         customerName: user?.name ?? user?.email,
         restaurantId: restaurantId ?? 'default',
         items: items.map(i => ({ id: i.id, name: i.name, price: i.price, qty: i.qty })),
