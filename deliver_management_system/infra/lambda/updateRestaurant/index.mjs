@@ -39,7 +39,7 @@ export const handler = async (event) => {
 
     if (name)                    { updates.push("#n = :n");    names["#n"] = "name";         values[":n"] = name; }
     if (location)                { updates.push("#l = :l");    names["#l"] = "location";     values[":l"] = location; }
-    if (menu)                    { updates.push("menu = :m");                                 values[":m"] = menu; }
+    if (menu !== undefined)      { updates.push("menu = :m");                                 values[":m"] = menu; }
     if (image !== undefined)     { updates.push("#img = :img"); names["#img"] = "image";      values[":img"] = image; }
     if (cuisine !== undefined)   { updates.push("cuisine = :c");                              values[":c"] = cuisine; }
     if (rating !== undefined)    { updates.push("rating = :rt");                              values[":rt"] = rating; }
