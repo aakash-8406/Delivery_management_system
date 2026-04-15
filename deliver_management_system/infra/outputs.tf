@@ -4,3 +4,8 @@ output "api_gateway_url" {
 }
 output "dynamodb_orders_table"      { value = aws_dynamodb_table.orders.name }
 output "dynamodb_restaurants_table" { value = aws_dynamodb_table.restaurants.name }
+
+output "cognito_customer_pool_id"     { value = aws_cognito_user_pool.customers.id }
+output "cognito_customer_client_id"   { value = aws_cognito_user_pool_client.customers.id }
+output "cognito_restaurant_pool_id"   { value = aws_cognito_user_pool.restaurants.id }
+output "cognito_restaurant_client_id" { value = aws_cognito_user_pool_client.restaurants.id }

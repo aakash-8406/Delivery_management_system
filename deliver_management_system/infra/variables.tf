@@ -28,6 +28,16 @@ variable "users_table_name" {
   default = "Users"
 }
 
+variable "cognito_customer_pool_name" {
+  type    = string
+  default = "smartqueue-customers"
+}
+
+variable "cognito_restaurant_pool_name" {
+  type    = string
+  default = "smartqueue-restaurants"
+}
+
 variable "lambda_runtime" {
   type    = string
   default = "nodejs20.x"

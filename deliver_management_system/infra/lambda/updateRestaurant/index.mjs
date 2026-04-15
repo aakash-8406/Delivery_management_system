@@ -15,10 +15,15 @@ const cors = {
 const verifyToken = (authHeader) => {
   if (!authHeader?.startsWith("Bearer ")) return null;
   try {
-    const [header, body, sig] = authHeader.slice(7).split(".");
-    const expected = createHmac("sha256", SECRET).update(`${header}.${body}`).digest("base64url");
-    if (sig !== expected) return null;
-    return JSON.parse(Buffer.from(body, "base64url").toString());
+    // Support both Cognito JWT (3 parts) and legacy HMAC JWT
+    const token = authHeader.slice(7);
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+    const body = JSON.parse(Buffer.from(parts[1], "base64url").toString());
+    // Cognito token: sub = userId, email = restaurantId
+    const restaurantId = body.email ?? body["cognito:username"] ?? body.restaurantId;
+    if (!restaurantId) return null;
+    return { restaurantId };
   } catch { return null; }
 };
 

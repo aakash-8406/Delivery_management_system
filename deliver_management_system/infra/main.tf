@@ -16,6 +16,78 @@ provider "aws" { region = var.aws_region }
 
 data "aws_caller_identity" "current" {}
 
+# ─── Cognito ──────────────────────────────────────────────────────────────────
+
+resource "aws_cognito_user_pool" "customers" {
+  name = var.cognito_customer_pool_name
+  auto_verified_attributes = ["email"]
+  username_attributes      = ["email"]
+
+  password_policy {
+    minimum_length    = 8
+    require_numbers   = true
+    require_symbols   = false
+    require_uppercase = false
+    require_lowercase = false
+  }
+
+  schema {
+    name                = "name"
+    attribute_data_type = "String"
+    mutable             = true
+    required            = true
+    string_attribute_constraints { min_length = "1" max_length = "100" }
+  }
+
+  tags = { Project = var.project }
+}
+
+resource "aws_cognito_user_pool_client" "customers" {
+  name         = "smartqueue-customer-client"
+  user_pool_id = aws_cognito_user_pool.customers.id
+  explicit_auth_flows = [
+    "ALLOW_USER_PASSWORD_AUTH",
+    "ALLOW_REFRESH_TOKEN_AUTH",
+    "ALLOW_USER_SRP_AUTH"
+  ]
+  prevent_user_existence_errors = "ENABLED"
+}
+
+resource "aws_cognito_user_pool" "restaurants" {
+  name = var.cognito_restaurant_pool_name
+  auto_verified_attributes = ["email"]
+  username_attributes      = ["email"]
+
+  password_policy {
+    minimum_length    = 8
+    require_numbers   = true
+    require_symbols   = false
+    require_uppercase = false
+    require_lowercase = false
+  }
+
+  schema {
+    name                = "name"
+    attribute_data_type = "String"
+    mutable             = true
+    required            = true
+    string_attribute_constraints { min_length = "1" max_length = "100" }
+  }
+
+  tags = { Project = var.project }
+}
+
+resource "aws_cognito_user_pool_client" "restaurants" {
+  name         = "smartqueue-restaurant-client"
+  user_pool_id = aws_cognito_user_pool.restaurants.id
+  explicit_auth_flows = [
+    "ALLOW_USER_PASSWORD_AUTH",
+    "ALLOW_REFRESH_TOKEN_AUTH",
+    "ALLOW_USER_SRP_AUTH"
+  ]
+  prevent_user_existence_errors = "ENABLED"
+}
+
 # ─── DynamoDB ─────────────────────────────────────────────────────────────────
 
 resource "aws_dynamodb_table" "orders" {

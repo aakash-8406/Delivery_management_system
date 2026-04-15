@@ -1,0 +1,1 @@
+{"statusCode":201,"headers":{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"Content-Type,Authorization","Content-Type":"application/json"},"body":"{\"data\":{\"user\":{\"email\":\"customer1@test.com\",\"name\":\"Test Customer\",\"userId\":\"u1776088710419\",\"createdAt\":\"2026-04-13T13:58:30.419Z\"},\"token\":\"cq_Y3VzdG9tZXIxQHRlc3QuY29t\"}}"}
