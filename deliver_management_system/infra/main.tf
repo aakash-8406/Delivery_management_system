@@ -36,7 +36,10 @@ resource "aws_cognito_user_pool" "customers" {
     attribute_data_type = "String"
     mutable             = true
     required            = true
-    string_attribute_constraints { min_length = "1" max_length = "100" }
+    string_attribute_constraints {
+      min_length = "1"
+      max_length = "100"
+    }
   }
 
   tags = { Project = var.project }
@@ -71,7 +74,10 @@ resource "aws_cognito_user_pool" "restaurants" {
     attribute_data_type = "String"
     mutable             = true
     required            = true
-    string_attribute_constraints { min_length = "1" max_length = "100" }
+    string_attribute_constraints {
+      min_length = "1"
+      max_length = "100"
+    }
   }
 
   tags = { Project = var.project }
