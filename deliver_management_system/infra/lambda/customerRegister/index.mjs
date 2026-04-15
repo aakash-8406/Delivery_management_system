@@ -15,7 +15,8 @@ const hash = (pw) => createHash("sha256").update(pw).digest("hex");
 
 export const handler = async (event) => {
   try {
-    const { name, email, password } = JSON.parse(event.body ?? "{}");
+    const { name, email: rawEmail, password } = JSON.parse(event.body ?? "{}");
+    const email = rawEmail?.toLowerCase().trim();
 
     if (!name || !email || !password)
       return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "name, email and password required" }) };

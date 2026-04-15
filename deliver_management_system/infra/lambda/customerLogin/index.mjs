@@ -15,24 +15,35 @@ const hash = (pw) => createHash("sha256").update(pw).digest("hex");
 
 export const handler = async (event) => {
   try {
-    const { email, password } = JSON.parse(event.body ?? "{}");
+    const { email: rawEmail, password } = JSON.parse(event.body ?? "{}");
 
-    if (!email || !password)
+    if (!rawEmail || !password)
       return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "email and password required" }) };
 
-    const { Item } = await client.send(new GetCommand({ TableName: TABLE, Key: { email } }));
+    const emailLower = rawEmail.toLowerCase().trim();
+    const emailOrig  = rawEmail.trim();
+
+    // Try lowercase first, then original case (for accounts registered before normalization)
+    let Item;
+    const res1 = await client.send(new GetCommand({ TableName: TABLE, Key: { email: emailLower } }));
+    Item = res1.Item;
+
+    if (!Item && emailOrig !== emailLower) {
+      const res2 = await client.send(new GetCommand({ TableName: TABLE, Key: { email: emailOrig } }));
+      Item = res2.Item;
+    }
 
     if (!Item)
-      return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "No account found with this email" }) };
+      return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "No account found with this email. Please register first." }) };
 
     if (Item.passwordHash !== hash(password))
-      return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "Incorrect password" }) };
+      return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "Incorrect password." }) };
 
     const { passwordHash: _, ...safe } = Item;
     return {
       statusCode: 200,
       headers: cors,
-      body: JSON.stringify({ data: { user: safe, token: "cq_" + Buffer.from(email).toString("base64") } }),
+      body: JSON.stringify({ data: { user: safe, token: "cq_" + Buffer.from(Item.email).toString("base64") } }),
     };
   } catch (err) {
     console.error(err);
