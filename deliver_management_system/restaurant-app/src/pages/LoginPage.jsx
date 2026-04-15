@@ -25,6 +25,8 @@ export default function LoginPage() {
         result = await loginRestaurant(form.email, form.password);
       } else {
         if (!form.name.trim()) throw new Error('Restaurant name is required');
+        if (form.password.length < 8 || !/\d/.test(form.password))
+          throw new Error('Password must be at least 8 characters and contain a number');
         result = await registerRestaurant({ name: form.name, location: form.location, email: form.email, password: form.password });
       }
       setSession(result.restaurant, result.token);

@@ -21,6 +21,9 @@ export const handler = async (event) => {
     if (!name || !email || !password)
       return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "name, email and password required" }) };
 
+    if (password.length < 8 || !/\d/.test(password))
+      return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "Password must be at least 8 characters and contain a number" }) };
+
     const { Item } = await client.send(new GetCommand({ TableName: TABLE, Key: { email } }));
     if (Item)
       return { statusCode: 409, headers: cors, body: JSON.stringify({ error: "Email already registered" }) };

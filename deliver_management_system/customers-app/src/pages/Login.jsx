@@ -25,6 +25,9 @@ const Login = () => {
     e.preventDefault();
     if (!form.email || !form.password) { setError('Please fill in all fields'); return; }
     if (!isLogin && !form.name.trim()) { setError('Please enter your name'); return; }
+    if (!isLogin && (form.password.length < 8 || !/\d/.test(form.password))) {
+      setError('Password must be at least 8 characters and contain a number'); return;
+    }
     setLoading(true); setError(''); setSuccess('');
     try {
       if (isLogin) {

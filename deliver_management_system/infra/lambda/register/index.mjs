@@ -21,6 +21,9 @@ export const handler = async (event) => {
     if (!name || !email || !password)
       return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "name, email and password required" }) };
 
+    if (password.length < 8 || !/\d/.test(password))
+      return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "Password must be at least 8 characters and contain a number" }) };
+
     // Check if user already exists in Users table
     const { Item: existing } = await client.send(
       new GetCommand({ TableName: USERS_TABLE, Key: { email } })

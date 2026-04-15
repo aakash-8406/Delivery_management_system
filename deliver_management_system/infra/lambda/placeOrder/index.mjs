@@ -11,8 +11,22 @@ const cors = {
   "Content-Type": "application/json",
 };
 
+// Verify customer token (cq_ + base64 email)
+const verifyCustomerToken = (authHeader) => {
+  if (!authHeader?.startsWith("Bearer cq_")) return null;
+  try {
+    const email = Buffer.from(authHeader.slice(10), "base64").toString("utf8");
+    return email.includes("@") ? { email } : null;
+  } catch { return null; }
+};
+
 export const handler = async (event) => {
   try {
+    // Require authentication
+    const claims = verifyCustomerToken(event.headers?.authorization ?? event.headers?.Authorization);
+    if (!claims)
+      return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "Please login to place an order" }) };
+
     const body = JSON.parse(event.body ?? "{}");
     const { customerName, items, totalAmount, deliveryFee, platformFee, deliveryAddress, details, restaurantId, userId } = body;
 
