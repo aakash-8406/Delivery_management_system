@@ -15,8 +15,22 @@ const Cart = () => {
   const [orderLoading, setOrderLoading] = useState(false);
   const [orderError, setOrderError] = useState(null);
   const [orderId, setOrderId] = useState(null);
-  const [address, setAddress] = useState({ line1: '', city: '', pincode: '' });
+
+  // Load saved address from localStorage
+  const [address, setAddress] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('biterush_address')) || { line1: '', city: '', pincode: '' }; }
+    catch { return { line1: '', city: '', pincode: '' }; }
+  });
   const [addressError, setAddressError] = useState(null);
+
+  // Save address to localStorage whenever it changes
+  const updateAddress = (updater) => {
+    setAddress(prev => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      localStorage.setItem('biterush_address', JSON.stringify(next));
+      return next;
+    });
+  };
   const grandTotal = totalPrice + DELIVERY_FEE + PLATFORM_FEE;
 
   const validateAddress = () => {
@@ -103,12 +117,12 @@ const Cart = () => {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-4">
         <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2"><MapPin size={18} className="text-orange-500" />Delivery Address</h3>
         <div className="space-y-3">
-          <input type="text" placeholder="Street address, flat / house no." value={address.line1} onChange={e => setAddress(a => ({ ...a, line1: e.target.value }))}
+          <input type="text" placeholder="Street address, flat / house no." value={address.line1} onChange={e => updateAddress(a => ({ ...a, line1: e.target.value }))}
             className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 outline-none focus:border-orange-400 transition-colors placeholder-gray-400" />
           <div className="flex gap-3">
-            <input type="text" placeholder="City" value={address.city} onChange={e => setAddress(a => ({ ...a, city: e.target.value }))}
+            <input type="text" placeholder="City" value={address.city} onChange={e => updateAddress(a => ({ ...a, city: e.target.value }))}
               className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 outline-none focus:border-orange-400 transition-colors placeholder-gray-400" />
-            <input type="text" placeholder="Pincode" value={address.pincode} maxLength={6} onChange={e => setAddress(a => ({ ...a, pincode: e.target.value.replace(/\D/g, '') }))}
+            <input type="text" placeholder="Pincode" value={address.pincode} maxLength={6} onChange={e => updateAddress(a => ({ ...a, pincode: e.target.value.replace(/\D/g, '') }))}
               className="w-32 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 outline-none focus:border-orange-400 transition-colors placeholder-gray-400" />
           </div>
         </div>

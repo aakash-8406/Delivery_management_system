@@ -146,7 +146,11 @@ export default function MenuPage() {
       setSession({ ...user, menu: newMenu }, localStorage.getItem('sq_token'));
       toast.success('Menu saved');
     } catch (err) {
-      toast.error(err.message ?? 'Failed to save');
+      if (err.message?.includes('401') || err.message?.toLowerCase().includes('unauthorized')) {
+        toast.error('Session expired — please log out and log in again');
+      } else {
+        toast.error(err.message ?? 'Failed to save');
+      }
     } finally { setSaving(false); }
   };
 
