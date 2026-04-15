@@ -1,11 +1,9 @@
 ﻿/**
  * customer-app/src/services/api.js
- * All calls go to real AWS backend. Auth uses AWS Cognito.
+ * Real AWS API Gateway — custom Lambda auth (no Cognito).
  */
 
-const BASE              = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
-const COGNITO_CLIENT_ID = import.meta.env.VITE_COGNITO_CUSTOMER_CLIENT_ID;
-const COGNITO_REGION    = import.meta.env.VITE_AWS_REGION ?? "ap-southeast-1";
+const BASE = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
 
 const getAuthHeader = () => {
   const token = localStorage.getItem('biterush_token');
@@ -23,59 +21,13 @@ const request = async (method, path, body) => {
   return { data: json.data ?? json };
 };
 
-// ─── Cognito ─────────────────────────────────────────────────────────────────
+// ─── Auth ─────────────────────────────────────────────────────────────────────
 
-const cognito = async (action, payload) => {
-  const res = await fetch(`https://cognito-idp.${COGNITO_REGION}.amazonaws.com/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-amz-json-1.1',
-      'X-Amz-Target': `AWSCognitoIdentityProviderService.${action}`,
-    },
-    body: JSON.stringify(payload),
-  });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.message ?? json.__type ?? 'Auth failed');
-  return json;
-};
+export const registerUser = (userData) => request('POST', '/customerRegister', userData);
+export const loginUser    = (credentials) => request('POST', '/customerLogin', credentials);
 
-export const registerUser = async ({ name, email, password }) => {
-  const e = email.toLowerCase().trim();
-  await cognito('SignUp', {
-    ClientId: COGNITO_CLIENT_ID,
-    Username: e,
-    Password: password,
-    UserAttributes: [{ Name: 'email', Value: e }, { Name: 'name', Value: name }],
-  });
-  return loginUser({ email, password });
-};
-
-export const loginUser = async ({ email, password }) => {
-  const data = await cognito('InitiateAuth', {
-    AuthFlow: 'USER_PASSWORD_AUTH',
-    ClientId: COGNITO_CLIENT_ID,
-    AuthParameters: { USERNAME: email.toLowerCase().trim(), PASSWORD: password },
-  });
-  const idToken = data.AuthenticationResult.IdToken;
-  const p = JSON.parse(atob(idToken.split('.')[1]));
-  const user = { id: p.sub, userId: p.sub, email: p.email, name: p.name ?? p['cognito:username'] };
-  return { data: { user, token: idToken } };
-};
-
-export const forgotPassword = async (email) => {
-  await cognito('ForgotPassword', { ClientId: COGNITO_CLIENT_ID, Username: email.toLowerCase().trim() });
-  return { data: { message: 'Reset code sent to ' + email } };
-};
-
-export const resetPassword = async (email, code, newPassword) => {
-  await cognito('ConfirmForgotPassword', {
-    ClientId: COGNITO_CLIENT_ID,
-    Username: email.toLowerCase().trim(),
-    ConfirmationCode: code,
-    Password: newPassword,
-  });
-  return { data: { message: 'Password reset successfully' } };
-};
+export const forgotPassword = async () => ({ data: { message: 'Contact support to reset your password' } });
+export const resetPassword  = async () => ({ data: { message: 'Contact support to reset your password' } });
 
 // ─── Restaurants ─────────────────────────────────────────────────────────────
 

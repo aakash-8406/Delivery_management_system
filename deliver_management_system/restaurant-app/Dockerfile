@@ -10,12 +10,8 @@ COPY . .
 
 ARG VITE_API_URL
 ARG VITE_MASTER_KEY
-ARG VITE_COGNITO_RESTAURANT_CLIENT_ID
-ARG VITE_AWS_REGION
 RUN echo "VITE_API_URL=${VITE_API_URL}" > .env && \
     echo "VITE_MASTER_KEY=${VITE_MASTER_KEY}" >> .env && \
-    echo "VITE_COGNITO_RESTAURANT_CLIENT_ID=${VITE_COGNITO_RESTAURANT_CLIENT_ID}" >> .env && \
-    echo "VITE_AWS_REGION=${VITE_AWS_REGION}" >> .env && \
     npm run build
 
 # ── Stage 2: Serve ────────────────────────────────────────────────────────────

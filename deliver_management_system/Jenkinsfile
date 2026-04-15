@@ -141,17 +141,13 @@ pipeline {
         stage('customer-app') {
           steps {
             withCredentials([
-              string(credentialsId: 'API_GATEWAY_URL',                  variable: 'API_URL'),
-              string(credentialsId: 'MASTER_KEY',                       variable: 'MKEY'),
-              string(credentialsId: 'COGNITO_CUSTOMER_CLIENT_ID',       variable: 'CUST_CLIENT'),
-              string(credentialsId: 'AWS_REGION',                       variable: 'AWS_REGION')
+              string(credentialsId: 'API_GATEWAY_URL', variable: 'API_URL'),
+              string(credentialsId: 'MASTER_KEY',      variable: 'MKEY')
             ]) {
               sh """
                 docker build \\
                   --build-arg VITE_API_URL=\${API_URL} \\
                   --build-arg VITE_MASTER_KEY=\${MKEY} \\
-                  --build-arg VITE_COGNITO_CUSTOMER_CLIENT_ID=\${CUST_CLIENT} \\
-                  --build-arg VITE_AWS_REGION=\${AWS_REGION} \\
                   -t ${CUSTOMER_IMAGE}:${IMAGE_TAG} \\
                   -t ${CUSTOMER_IMAGE}:latest \\
                   ./deliver_management_system/customers-app
@@ -163,17 +159,13 @@ pipeline {
         stage('restaurant-app') {
           steps {
             withCredentials([
-              string(credentialsId: 'API_GATEWAY_URL',                  variable: 'API_URL'),
-              string(credentialsId: 'MASTER_KEY',                       variable: 'MKEY'),
-              string(credentialsId: 'COGNITO_RESTAURANT_CLIENT_ID',     variable: 'REST_CLIENT'),
-              string(credentialsId: 'AWS_REGION',                       variable: 'AWS_REGION')
+              string(credentialsId: 'API_GATEWAY_URL', variable: 'API_URL'),
+              string(credentialsId: 'MASTER_KEY',      variable: 'MKEY')
             ]) {
               sh """
                 docker build \\
                   --build-arg VITE_API_URL=\${API_URL} \\
                   --build-arg VITE_MASTER_KEY=\${MKEY} \\
-                  --build-arg VITE_COGNITO_RESTAURANT_CLIENT_ID=\${REST_CLIENT} \\
-                  --build-arg VITE_AWS_REGION=\${AWS_REGION} \\
                   -t ${RESTAURANT_IMAGE}:${IMAGE_TAG} \\
                   -t ${RESTAURANT_IMAGE}:latest \\
                   ./deliver_management_system/restaurant-app
