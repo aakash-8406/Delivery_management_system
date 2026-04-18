@@ -1,9 +1,0 @@
-{
-  "name": "mock-server",
-  "version": "1.0.0",
-  "description": "Shared local mock API for customer-app and restaurant-app",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  }
-}
