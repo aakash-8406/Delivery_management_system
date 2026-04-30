@@ -1,8 +1,4 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
-
-const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
-const TABLE = process.env.TABLE_NAME;
+import mysql from "mysql2/promise";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -10,36 +6,40 @@ const cors = {
   "Content-Type": "application/json",
 };
 
+const getConn = () => mysql.createConnection({
+  host: process.env.DB_HOST, port: Number(process.env.DB_PORT) || 3306,
+  user: process.env.DB_USER, password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
+
 export const handler = async (event) => {
+  const conn = await getConn();
   try {
     const { restaurantId, userId } = event.queryStringParameters ?? {};
 
-    let FilterExpression;
-    let ExpressionAttributeValues;
+    let sql = "SELECT * FROM orders";
+    const params = [];
 
     if (restaurantId && userId) {
-      FilterExpression = "restaurantId = :r AND userId = :u";
-      ExpressionAttributeValues = { ":r": restaurantId, ":u": userId };
+      sql += " WHERE restaurantId = ? AND userId = ?";
+      params.push(restaurantId, userId);
     } else if (restaurantId) {
-      FilterExpression = "restaurantId = :r";
-      ExpressionAttributeValues = { ":r": restaurantId };
+      sql += " WHERE restaurantId = ?";
+      params.push(restaurantId);
     } else if (userId) {
-      FilterExpression = "userId = :u";
-      ExpressionAttributeValues = { ":u": userId };
+      sql += " WHERE userId = ?";
+      params.push(userId);
     }
 
-    const params = { TableName: TABLE };
-    if (FilterExpression) {
-      params.FilterExpression = FilterExpression;
-      params.ExpressionAttributeValues = ExpressionAttributeValues;
-    }
+    sql += " ORDER BY createdAt DESC";
 
-    const { Items = [] } = await client.send(new ScanCommand(params));
-    Items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    return { statusCode: 200, headers: cors, body: JSON.stringify({ data: Items }) };
+    const [rows] = await conn.execute(sql, params);
+    const items = rows.map(r => ({ ...r, items: JSON.parse(r.items ?? "[]") }));
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ data: items }) };
   } catch (err) {
     console.error(err);
     return { statusCode: 500, headers: cors, body: JSON.stringify({ error: err.message }) };
+  } finally {
+    await conn.end();
   }
 };

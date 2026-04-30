@@ -1,5 +1,5 @@
 {
-  "name": "update-order",
+  "name": "get-restaurants",
   "version": "1.0.0",
   "type": "module",
   "dependencies": {

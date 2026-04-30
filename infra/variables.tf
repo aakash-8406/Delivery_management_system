@@ -10,18 +10,6 @@ variable "project" {
   default     = "smartqueue"
 }
 
-variable "dynamodb_table_name" {
-  description = "DynamoDB orders table name"
-  type        = string
-  default     = "Orders"
-}
-
-variable "restaurants_table_name" {
-  description = "DynamoDB restaurants table name"
-  type        = string
-  default     = "Restaurants"
-}
-
 variable "lambda_runtime" {
   description = "Lambda runtime"
   type        = string
@@ -39,5 +27,24 @@ variable "master_key" {
   description = "Master admin key for managing all restaurants"
   type        = string
   default     = "MASTER-SMARTQUEUE-2024"
+  sensitive   = true
+}
+
+variable "db_name" {
+  description = "RDS database name"
+  type        = string
+  default     = "smartqueue"
+}
+
+variable "db_username" {
+  description = "RDS master username"
+  type        = string
+  default     = "admin"
+  sensitive   = true
+}
+
+variable "db_password" {
+  description = "RDS master password"
+  type        = string
   sensitive   = true
 }

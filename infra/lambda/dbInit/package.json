@@ -1,5 +1,5 @@
 {
-  "name": "update-order",
+  "name": "db-init",
   "version": "1.0.0",
   "type": "module",
   "dependencies": {

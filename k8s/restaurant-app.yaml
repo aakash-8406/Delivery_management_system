@@ -1,5 +1,5 @@
 ---
-# ── Deployment ────────────────────────────────────────────────────────────────
+# Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -48,8 +48,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
 
----
-# ── Service ───────────────────────────────────────────────────────────────────
+# Service
 apiVersion: v1
 kind: Service
 metadata:

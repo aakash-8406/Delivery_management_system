@@ -1,17 +1,19 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, UpdateCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
+import mysql from "mysql2/promise";
 import { createHmac } from "crypto";
 
-const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
-const TABLE = process.env.TABLE_NAME;
 const SECRET = process.env.JWT_SECRET;
-const VALID = ["ACCEPTED", "DELAYED", "REJECTED", "DELIVERED"];
-
+const VALID  = ["ACCEPTED", "DELAYED", "REJECTED", "DELIVERED"];
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type,Authorization",
   "Content-Type": "application/json",
 };
+
+const getConn = () => mysql.createConnection({
+  host: process.env.DB_HOST, port: Number(process.env.DB_PORT) || 3306,
+  user: process.env.DB_USER, password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
 
 const verifyToken = (authHeader) => {
   if (!authHeader?.startsWith("Bearer ")) return null;
@@ -24,36 +26,33 @@ const verifyToken = (authHeader) => {
 };
 
 export const handler = async (event) => {
+  const conn = await getConn();
   try {
     const id = event.pathParameters?.id;
     const { status } = JSON.parse(event.body ?? "{}");
 
-    if (!id) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "id required" }) };
-    if (!VALID.includes(status)) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: `status must be one of: ${VALID.join(", ")}` }) };
+    if (!id)                      return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "id required" }) };
+    if (!VALID.includes(status))  return { statusCode: 400, headers: cors, body: JSON.stringify({ error: `status must be one of: ${VALID.join(", ")}` }) };
 
-    // Verify token and restaurantId ownership
     const claims = verifyToken(event.headers?.authorization ?? event.headers?.Authorization);
     if (claims) {
-      const { Item: existing } = await client.send(new GetCommand({ TableName: TABLE, Key: { id } }));
-      if (existing && existing.restaurantId && existing.restaurantId !== claims.restaurantId)
+      const [rows] = await conn.execute("SELECT restaurantId FROM orders WHERE id = ?", [id]);
+      if (rows.length > 0 && rows[0].restaurantId && rows[0].restaurantId !== claims.restaurantId)
         return { statusCode: 403, headers: cors, body: JSON.stringify({ error: "Forbidden — not your order" }) };
     }
 
-    await client.send(new UpdateCommand({
-      TableName: TABLE,
-      Key: { id },
-      UpdateExpression: "SET #s = :s, updatedAt = :u",
-      ExpressionAttributeNames: { "#s": "status" },
-      ExpressionAttributeValues: { ":s": status, ":u": new Date().toISOString() },
-      ConditionExpression: "attribute_exists(id)",
-    }));
-
-    const { Item } = await client.send(new GetCommand({ TableName: TABLE, Key: { id } }));
-    return { statusCode: 200, headers: cors, body: JSON.stringify({ data: Item }) };
-  } catch (err) {
-    if (err.name === "ConditionalCheckFailedException")
+    const updatedAt = new Date().toISOString();
+    const [result] = await conn.execute("UPDATE orders SET status = ?, updatedAt = ? WHERE id = ?", [status, updatedAt, id]);
+    if (result.affectedRows === 0)
       return { statusCode: 404, headers: cors, body: JSON.stringify({ error: "Order not found" }) };
+
+    const [rows] = await conn.execute("SELECT * FROM orders WHERE id = ?", [id]);
+    const item = { ...rows[0], items: JSON.parse(rows[0].items ?? "[]") };
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ data: item }) };
+  } catch (err) {
     console.error(err);
     return { statusCode: 500, headers: cors, body: JSON.stringify({ error: err.message }) };
+  } finally {
+    await conn.end();
   }
 };

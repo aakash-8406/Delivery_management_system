@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    DOCKERHUB_USER   = "aakash985"   
+    DOCKERHUB_USER   = "aakash985"
     CUSTOMER_IMAGE   = "${DOCKERHUB_USER}/bitrush-customer"
     RESTAURANT_IMAGE = "${DOCKERHUB_USER}/smartqueue-restaurant"
     IMAGE_TAG        = "${BUILD_NUMBER}"
@@ -19,25 +19,60 @@ pipeline {
       }
     }
 
-    // ── 2. Build — secrets injected from Jenkins Credentials ─────────────────
+    // ── 2. Install Lambda dependencies ────────────────────────────────────────
+    stage('Install Lambda Deps') {
+      steps {
+        sh """
+          for dir in infra/lambda/*/; do
+            if [ -f "\${dir}package.json" ]; then
+              echo "Installing deps in \${dir}..."
+              npm install --omit=dev --prefix "\${dir}" --silent
+            fi
+          done
+        """
+      }
+    }
+
+    // ── 3. Provision RDS + Lambdas via Terraform ──────────────────────────────
+    stage('Terraform: Provision RDS & Infra') {
+      steps {
+        withCredentials([
+          string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASS')
+        ]) {
+          sh """
+            cd infra
+            terraform init -input=false
+            terraform apply -auto-approve -input=false \
+              -var="db_password=\${DB_PASS}"
+          """
+          // Capture the new API Gateway URL output and store for next stages
+          script {
+            env.API_GATEWAY_URL = sh(
+              script: "cd infra && terraform output -raw api_gateway_url",
+              returnStdout: true
+            ).trim()
+            echo "API Gateway URL: ${env.API_GATEWAY_URL}"
+          }
+        }
+      }
+    }
+
+    // ── 4. Build Docker images (API URL injected from Terraform output) ────────
     stage('Build Images') {
       parallel {
 
         stage('customer-app') {
           steps {
-            // API_GATEWAY_URL and MASTER_KEY are stored in Jenkins Credentials
-            // They are NEVER in GitHub — Jenkins injects them here at build time
             withCredentials([
-              string(credentialsId: 'API_GATEWAY_URL', variable: 'API_URL'),
-              string(credentialsId: 'MASTER_KEY',      variable: 'MKEY')
+              string(credentialsId: 'MASTER_KEY', variable: 'MKEY')
             ]) {
               sh """
-                docker build \\
-                  --build-arg VITE_API_URL=\${API_URL} \\
-                  --build-arg VITE_MASTER_KEY=\${MKEY} \\
-                  -t ${CUSTOMER_IMAGE}:${IMAGE_TAG} \\
-                  -t ${CUSTOMER_IMAGE}:latest \\
-                  ./customer-app
+                docker build \
+                  --build-arg VITE_API_URL=${env.API_GATEWAY_URL} \
+                  --build-arg VITE_MASTER_KEY=\${MKEY} \
+                  -t ${CUSTOMER_IMAGE}:${IMAGE_TAG} \
+                  -t ${CUSTOMER_IMAGE}:latest \
+                  ./customers-app
               """
             }
           }
@@ -46,15 +81,14 @@ pipeline {
         stage('restaurant-app') {
           steps {
             withCredentials([
-              string(credentialsId: 'API_GATEWAY_URL', variable: 'API_URL'),
-              string(credentialsId: 'MASTER_KEY',      variable: 'MKEY')
+              string(credentialsId: 'MASTER_KEY', variable: 'MKEY')
             ]) {
               sh """
-                docker build \\
-                  --build-arg VITE_API_URL=\${API_URL} \\
-                  --build-arg VITE_MASTER_KEY=\${MKEY} \\
-                  -t ${RESTAURANT_IMAGE}:${IMAGE_TAG} \\
-                  -t ${RESTAURANT_IMAGE}:latest \\
+                docker build \
+                  --build-arg VITE_API_URL=${env.API_GATEWAY_URL} \
+                  --build-arg VITE_MASTER_KEY=\${MKEY} \
+                  -t ${RESTAURANT_IMAGE}:${IMAGE_TAG} \
+                  -t ${RESTAURANT_IMAGE}:latest \
                   ./restaurant-app
               """
             }
@@ -64,7 +98,7 @@ pipeline {
       }
     }
 
-    // ── 3. Push to DockerHub ─────────────────────────────────────────────────
+    // ── 5. Push to DockerHub ──────────────────────────────────────────────────
     stage('Push to DockerHub') {
       steps {
         withCredentials([usernamePassword(
@@ -84,22 +118,22 @@ pipeline {
       }
     }
 
-    // ── 4. Deploy to Kubernetes ──────────────────────────────────────────────
+    // ── 6. Deploy to Kubernetes ───────────────────────────────────────────────
     stage('Deploy to Kubernetes') {
       steps {
         sh """
           kubectl apply -f k8s/namespace.yaml
 
-          sed 's|DOCKERHUB_USER|${DOCKERHUB_USER}|g; s|IMAGE_TAG|${IMAGE_TAG}|g' \\
+          sed 's|DOCKERHUB_USER|${DOCKERHUB_USER}|g; s|IMAGE_TAG|${IMAGE_TAG}|g' \
             k8s/customer-app.yaml | kubectl apply -f -
 
-          sed 's|DOCKERHUB_USER|${DOCKERHUB_USER}|g; s|IMAGE_TAG|${IMAGE_TAG}|g' \\
+          sed 's|DOCKERHUB_USER|${DOCKERHUB_USER}|g; s|IMAGE_TAG|${IMAGE_TAG}|g' \
             k8s/restaurant-app.yaml | kubectl apply -f -
         """
       }
     }
 
-    // ── 5. Verify rollout ────────────────────────────────────────────────────
+    // ── 7. Verify rollout ─────────────────────────────────────────────────────
     stage('Verify Rollout') {
       steps {
         sh """
@@ -111,7 +145,7 @@ pipeline {
       }
     }
 
-    // ── 6. Cleanup ───────────────────────────────────────────────────────────
+    // ── 8. Cleanup ────────────────────────────────────────────────────────────
     stage('Cleanup') {
       steps {
         sh "docker image prune -f || true"
@@ -129,6 +163,7 @@ pipeline {
         echo "--------------------------------------------"
         echo "customer-app   → http://\${EC2_IP}:30174"
         echo "restaurant-app → http://\${EC2_IP}:30175"
+        echo "API Gateway    → ${env.API_GATEWAY_URL}"
         echo "============================================"
       """
     }
