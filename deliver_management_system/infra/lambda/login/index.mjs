@@ -1,21 +1,22 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
+import mysql from "mysql2/promise";
 import { createHash, createHmac } from "crypto";
-
-const client      = DynamoDBDocumentClient.from(new DynamoDBClient({}));
-const USERS_TABLE = process.env.USERS_TABLE;
-const REST_TABLE  = process.env.RESTAURANTS_TABLE;
-const SECRET      = process.env.JWT_SECRET ?? "smartqueue-secret";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type,Authorization",
+  "Access-Control-Allow-Headers": "Content-Type,Authorization,x-master-key",
   "Content-Type": "application/json",
 };
 
+const SECRET = process.env.JWT_SECRET ?? "smartqueue-secret";
+
+const getConn = () => mysql.createConnection({
+  host: process.env.DB_HOST, port: Number(process.env.DB_PORT) || 3306,
+  user: process.env.DB_USER, password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
+
 const hash = (pw) => createHash("sha256").update(pw).digest("hex");
 
-// Proper JWT so updateRestaurant can verify it
 const makeToken = (payload) => {
   const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url");
   const body   = Buffer.from(JSON.stringify({ ...payload, iat: Date.now() })).toString("base64url");
@@ -24,39 +25,29 @@ const makeToken = (payload) => {
 };
 
 export const handler = async (event) => {
+  const conn = await getConn();
   try {
     const { email: rawEmail, password } = JSON.parse(event.body ?? "{}");
     const email = rawEmail?.toLowerCase().trim();
     if (!email || !password)
       return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "email and password required" }) };
 
-    const { Item: user } = await client.send(
-      new GetCommand({ TableName: USERS_TABLE, Key: { email } })
-    );
-
-    if (!user)
+    const [rows] = await conn.execute("SELECT * FROM restaurants WHERE email = ?", [email]);
+    if (!rows.length)
       return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "No account found with this email" }) };
 
-    if (user.passwordHash !== hash(password))
+    const restaurant = rows[0];
+    if (restaurant.password !== hash(password))
       return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "Incorrect password" }) };
 
-    const { Item: restaurant } = await client.send(
-      new GetCommand({ TableName: REST_TABLE, Key: { restaurantId: user.restaurantId } })
-    );
-
-    if (!restaurant)
-      return { statusCode: 404, headers: cors, body: JSON.stringify({ error: "Restaurant profile not found" }) };
-
-    // JWT with restaurantId claim — required by updateRestaurant Lambda
     const token = makeToken({ restaurantId: restaurant.restaurantId, name: restaurant.name });
+    const data = { ...restaurant, menu: restaurant.menu ? JSON.parse(restaurant.menu) : [] };
 
-    return {
-      statusCode: 200,
-      headers: cors,
-      body: JSON.stringify({ data: { token, restaurant } }),
-    };
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ data: { token, restaurant: data } }) };
   } catch (err) {
     console.error("Login error:", err);
     return { statusCode: 500, headers: cors, body: JSON.stringify({ error: err.message }) };
+  } finally {
+    await conn.end();
   }
 };

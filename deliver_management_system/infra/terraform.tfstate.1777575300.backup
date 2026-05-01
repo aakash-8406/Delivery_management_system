@@ -1,0 +1,2328 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.8",
+  "serial": 37,
+  "lineage": "9cd010f6-99de-6d74-6c16-cf0b025adba4",
+  "outputs": {
+    "api_gateway_url": {
+      "value": null,
+      "type": "string"
+    },
+    "rds_database": {
+      "value": "smartqueue",
+      "type": "string"
+    },
+    "rds_endpoint": {
+      "value": "smartqueue-mysql.cliwcewwcbhv.ap-southeast-1.rds.amazonaws.com:3306",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "data",
+      "type": "archive_file",
+      "name": "db_init_zip",
+      "provider": "provider[\"registry.terraform.io/hashicorp/archive\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "exclude_symlink_directories": null,
+            "excludes": [
+              "package-lock.json"
+            ],
+            "id": "f76bf22415d9d5da548cb2a6523eb877ece60a63",
+            "output_base64sha256": "BTFEOI3Tjq/yOPv8ahdD5NTxTGMpxlIdaQ16ELOwWH8=",
+            "output_base64sha512": "oOfB2WhNucSzUrZSFzyqrjYqX6WbiXabZ2tozuajw4ZTuwcd/YbN0/lI1YYDFD7R5yM/kuu8pBD3ftgnCb4ASw==",
+            "output_file_mode": null,
+            "output_md5": "b2672cbc829b9e29d578600523caaa6c",
+            "output_path": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/.build/dbInit.zip",
+            "output_sha": "f76bf22415d9d5da548cb2a6523eb877ece60a63",
+            "output_sha256": "053144388dd38eaff238fbfc6a1743e4d4f14c6329c6521d690d7a10b3b0587f",
+            "output_sha512": "a0e7c1d9684db9c4b352b652173caaae362a5fa59b89769b676b68cee6a3c38653bb071dfd86cdd3f948d58603143ed1e7233f92ebbca410f77ed82709be004b",
+            "output_size": 551301,
+            "source": [],
+            "source_content": null,
+            "source_content_filename": null,
+            "source_dir": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/lambda/dbInit",
+            "source_file": null,
+            "type": "zip"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "archive_file",
+      "name": "delete_restaurant_zip",
+      "provider": "provider[\"registry.terraform.io/hashicorp/archive\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "exclude_symlink_directories": null,
+            "excludes": [
+              "package-lock.json"
+            ],
+            "id": "8918d0b74346c7af50dc0729a36b2b011821caad",
+            "output_base64sha256": "/PS9OMfoeXZOVkt13ls4Pu0O/AWK9y7TxBxBpymCNbU=",
+            "output_base64sha512": "pGLFE9BWtls8QHIQNOMid9R1lmfmwvG+vtHbKQG9KdcraMHULbPc8tVmNUdB0z2oJIr59/sI90RXpIG/EVKvvA==",
+            "output_file_mode": null,
+            "output_md5": "36c24ef7e3d253e6e9bc2ec909dc8f24",
+            "output_path": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/.build/deleteRestaurant.zip",
+            "output_sha": "8918d0b74346c7af50dc0729a36b2b011821caad",
+            "output_sha256": "fcf4bd38c7e879764e564b75de5b383eed0efc058af72ed3c41c41a7298235b5",
+            "output_sha512": "a462c513d056b65b3c40721034e32277d4759667e6c2f1bebed1db2901bd29d72b68c1d42db3dcf2d566354741d33da8248af9f7fb08f74457a481bf1152afbc",
+            "output_size": 692,
+            "source": [],
+            "source_content": null,
+            "source_content_filename": null,
+            "source_dir": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/lambda/deleteRestaurant",
+            "source_file": null,
+            "type": "zip"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "archive_file",
+      "name": "get_orders_zip",
+      "provider": "provider[\"registry.terraform.io/hashicorp/archive\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "exclude_symlink_directories": null,
+            "excludes": [
+              "package-lock.json"
+            ],
+            "id": "e8379fdb6b9636698ab5bf0a5c5a8e079ef7e7df",
+            "output_base64sha256": "L6oQ3/HICKdWRSDJvfEh6vU0ptmrA434zkET5Ybsa1o=",
+            "output_base64sha512": "fHALbKwqMClNO7tfrAQDPBOgL6atmFSTdTmBnuvt93MJRGq6HHOuWXHKpW6zWVabFx760m4zFAUBaMhMKHxrwA==",
+            "output_file_mode": null,
+            "output_md5": "d220f64eeef54fb924d908a30ab103a7",
+            "output_path": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/.build/getOrders.zip",
+            "output_sha": "e8379fdb6b9636698ab5bf0a5c5a8e079ef7e7df",
+            "output_sha256": "2faa10dff1c808a7564520c9bdf121eaf534a6d9ab038df8ce4113e586ec6b5a",
+            "output_sha512": "7c700b6cac2a30294d3bbb5fac04033c13a02fa6ad9854937539819eebedf77309446aba1c73ae5971caa56eb359569b171efad26e3314050168c84c287c6bc0",
+            "output_size": 1613,
+            "source": [],
+            "source_content": null,
+            "source_content_filename": null,
+            "source_dir": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/lambda/getOrders",
+            "source_file": null,
+            "type": "zip"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "archive_file",
+      "name": "get_restaurant_by_id_zip",
+      "provider": "provider[\"registry.terraform.io/hashicorp/archive\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "exclude_symlink_directories": null,
+            "excludes": [
+              "package-lock.json"
+            ],
+            "id": "4e73be11269c8a03189064a297e498b0066fc5ca",
+            "output_base64sha256": "iVVUdv7VpHRi1J+39Z5NY0BAXHcN/mrf9ZjIlj3ksoY=",
+            "output_base64sha512": "3hz8fCYcFDfvS51OI03JkPzZs2W80bB9+9DmWlMobE9whFsvJ24HAMMpiAYtgItDBJghbK2dfvS5texepHyUCQ==",
+            "output_file_mode": null,
+            "output_md5": "432330931e2a4434bccc493baf120c7c",
+            "output_path": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/.build/getRestaurantById.zip",
+            "output_sha": "4e73be11269c8a03189064a297e498b0066fc5ca",
+            "output_sha256": "89555476fed5a47462d49fb7f59e4d6340405c770dfe6adff598c8963de4b286",
+            "output_sha512": "de1cfc7c261c1437ef4b9d4e234dc990fcd9b365bcd1b07dfbd0e65a53286c4f70845b2f276e0700c32988062d808b430498216cad9d7ef4b9b5ec5ea47c9409",
+            "output_size": 636,
+            "source": [],
+            "source_content": null,
+            "source_content_filename": null,
+            "source_dir": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/lambda/getRestaurantById",
+            "source_file": null,
+            "type": "zip"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "archive_file",
+      "name": "get_restaurants_zip",
+      "provider": "provider[\"registry.terraform.io/hashicorp/archive\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "exclude_symlink_directories": null,
+            "excludes": [
+              "package-lock.json"
+            ],
+            "id": "d12ba4f5b18375c9fb952b5bd2a9b43f29a753f9",
+            "output_base64sha256": "UH1PBU7g51sdN7jNqofgFeI+MaAHdBJEsUL+Sq3oYkM=",
+            "output_base64sha512": "TEVu9QakO5fxoxhBBPTTXQf2k6R0VvCt6D5yRLQEHHOjSiSTMg3xWVFqGvYm08jqjRNfrlNlHT6ZSYKMLpX4EA==",
+            "output_file_mode": null,
+            "output_md5": "a65806278de71f1f0124cb8db63c0902",
+            "output_path": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/.build/getRestaurants.zip",
+            "output_sha": "d12ba4f5b18375c9fb952b5bd2a9b43f29a753f9",
+            "output_sha256": "507d4f054ee0e75b1d37b8cdaa87e015e23e31a007741244b142fe4aade86243",
+            "output_sha512": "4c456ef506a43b97f1a3184104f4d35d07f693a47456f0ade83e7244b4041c73a34a2493320df159516a1af626d3c8ea8d135fae53651d3e9949828c2e95f810",
+            "output_size": 664,
+            "source": [],
+            "source_content": null,
+            "source_content_filename": null,
+            "source_dir": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/lambda/getRestaurants",
+            "source_file": null,
+            "type": "zip"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "archive_file",
+      "name": "login_zip",
+      "provider": "provider[\"registry.terraform.io/hashicorp/archive\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "exclude_symlink_directories": null,
+            "excludes": [
+              "package-lock.json"
+            ],
+            "id": "640d3aa1b39c9218dff203cb82408fa321d5f402",
+            "output_base64sha256": "XFixT9MeX6AYk49dhZYYteaO5HUBRFA6qLi3Ok/f6e4=",
+            "output_base64sha512": "v+Tzu5/7hPnCv1wno/ZMI3dNW24Kws1KKAEzl3DtN9l5EMVzvfUjg1cL29G31g6EKMe2FlMx2MgJjRjTruYy3w==",
+            "output_file_mode": null,
+            "output_md5": "59110626202fa209761028586d1dd645",
+            "output_path": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/.build/login.zip",
+            "output_sha": "640d3aa1b39c9218dff203cb82408fa321d5f402",
+            "output_sha256": "5c58b14fd31e5fa018938f5d859618b5e68ee4750144503aa8b8b73a4fdfe9ee",
+            "output_sha512": "bfe4f3bb9ffb84f9c2bf5c27a3f64c23774d5b6e0ac2cd4a2801339770ed37d97910c573bdf52383570bdbd1b7d60e8428c7b6165331d8c8098d18d3aee632df",
+            "output_size": 1118,
+            "source": [],
+            "source_content": null,
+            "source_content_filename": null,
+            "source_dir": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/lambda/login",
+            "source_file": null,
+            "type": "zip"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "archive_file",
+      "name": "place_order_zip",
+      "provider": "provider[\"registry.terraform.io/hashicorp/archive\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "exclude_symlink_directories": null,
+            "excludes": [
+              "package-lock.json"
+            ],
+            "id": "d8dc9bca1cca7589a9d476a84bc0deef979615d8",
+            "output_base64sha256": "nS2kuh0z/bXZGHzl2C7tPq/anMos+nSv0c9hZa6HiRU=",
+            "output_base64sha512": "Z+B9pGgIH7ul5rz+zV+iFqfHOcDc9tbOG12yYoFf4rjU7r4O2dlKOCnZielinl4f0cTwi+4Flm7Jz1JM7FeP/g==",
+            "output_file_mode": null,
+            "output_md5": "58d31286d488e3534639fc06df86874e",
+            "output_path": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/.build/placeOrder.zip",
+            "output_sha": "d8dc9bca1cca7589a9d476a84bc0deef979615d8",
+            "output_sha256": "9d2da4ba1d33fdb5d9187ce5d82eed3eafda9cca2cfa74afd1cf6165ae878915",
+            "output_sha512": "67e07da468081fbba5e6bcfecd5fa216a7c739c0dcf6d6ce1b5db262815fe2b8d4eebe0ed9d94a3829d989e9629e5e1fd1c4f08bee05966ec9cf524cec578ffe",
+            "output_size": 2289,
+            "source": [],
+            "source_content": null,
+            "source_content_filename": null,
+            "source_dir": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/lambda/placeOrder",
+            "source_file": null,
+            "type": "zip"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "archive_file",
+      "name": "register_zip",
+      "provider": "provider[\"registry.terraform.io/hashicorp/archive\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "exclude_symlink_directories": null,
+            "excludes": [
+              "package-lock.json"
+            ],
+            "id": "a2407f42de2e04fb40dbfc9edbd51d8344b53ae3",
+            "output_base64sha256": "kCAKGEu8txoffBDE/x174tSETf4isMGjFiOCnL13lVI=",
+            "output_base64sha512": "HcaaKss6IcC5rasrX0rEk9YwydtOPhOC1XxCtJCgSo25Wl9Sw/9EsiLliaauZXgubUyeZhtRECbU3B3GGnxSmA==",
+            "output_file_mode": null,
+            "output_md5": "57becd1d55cbe2ed78e7505283625620",
+            "output_path": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/.build/register.zip",
+            "output_sha": "a2407f42de2e04fb40dbfc9edbd51d8344b53ae3",
+            "output_sha256": "90200a184bbcb71a1f7c10c4ff1d7be2d4844dfe22b0c1a31623829cbd779552",
+            "output_sha512": "1dc69a2acb3a21c0b9adab2b5f4ac493d630c9db4e3e1382d57c42b490a04a8db95a5f52c3ff44b222e589a6ae65782e6d4c9e661b511026d4dc1dc61a7c5298",
+            "output_size": 1148,
+            "source": [],
+            "source_content": null,
+            "source_content_filename": null,
+            "source_dir": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/lambda/register",
+            "source_file": null,
+            "type": "zip"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "archive_file",
+      "name": "update_order_zip",
+      "provider": "provider[\"registry.terraform.io/hashicorp/archive\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "exclude_symlink_directories": null,
+            "excludes": [
+              "package-lock.json"
+            ],
+            "id": "8934ba96b2c879ad88627fc27c3ac40d93ce80fd",
+            "output_base64sha256": "qgi2fgxkhng2+3JY09qlkJeG4A/3K+ukFsG/KCsk8uk=",
+            "output_base64sha512": "LYnmJTv9G8W8HsMdoXtPXT0xbCCypRcC80neKrf/igJ49dSq6irnmZU831YlXpTytxuAg6ry9uhn8lo2vU+MLw==",
+            "output_file_mode": null,
+            "output_md5": "32aa69d676831518257da582521b35c0",
+            "output_path": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/.build/updateOrder.zip",
+            "output_sha": "8934ba96b2c879ad88627fc27c3ac40d93ce80fd",
+            "output_sha256": "aa08b67e0c64867836fb7258d3daa5909786e00ff72beba416c1bf282b24f2e9",
+            "output_sha512": "2d89e6253bfd1bc5bc1ec31da17b4f5d3d316c20b2a51702f349de2ab7ff8a0278f5d4aaea2ae799953cdf56255e94f2b71b8083aaf2f6e867f25a36bd4f8c2f",
+            "output_size": 2407,
+            "source": [],
+            "source_content": null,
+            "source_content_filename": null,
+            "source_dir": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/lambda/updateOrder",
+            "source_file": null,
+            "type": "zip"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "archive_file",
+      "name": "update_restaurant_zip",
+      "provider": "provider[\"registry.terraform.io/hashicorp/archive\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "exclude_symlink_directories": null,
+            "excludes": [
+              "package-lock.json"
+            ],
+            "id": "54b8ad8591092703d0556599b55ad0142515f430",
+            "output_base64sha256": "Ku8XfJ9pqKBU/HuJTrym5JqKCbhQ1YlV/3PQEEpgCgQ=",
+            "output_base64sha512": "39IZzzd/ouhqRccGQUR2qtRhHS2cvSIJUIDPRCOXKgCb+WQ/F6pCnPxMu5k1ZCrH5kZSYjpd1v/WRtpSENzWwA==",
+            "output_file_mode": null,
+            "output_md5": "34214d6056c8622995396827e5cd5236",
+            "output_path": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/.build/updateRestaurant.zip",
+            "output_sha": "54b8ad8591092703d0556599b55ad0142515f430",
+            "output_sha256": "2aef177c9f69a8a054fc7b894ebca6e49a8a09b850d58955ff73d0104a600a04",
+            "output_sha512": "dfd219cf377fa2e86a45c706414476aad4611d2d9cbd22095080cf4423972a009bf9643f17aa429cfc4cbb9935642ac7e64652623a5dd6ffd646da5210dcd6c0",
+            "output_size": 1524,
+            "source": [],
+            "source_content": null,
+            "source_content_filename": null,
+            "source_dir": "C:/Users/Aakash M/Documents/deliver_management_system/deliver_management_system/infra/lambda/updateRestaurant",
+            "source_file": null,
+            "type": "zip"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "aws_availability_zones",
+      "name": "available",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "all_availability_zones": null,
+            "exclude_names": null,
+            "exclude_zone_ids": null,
+            "filter": null,
+            "group_names": [
+              "ap-southeast-1-zg-1"
+            ],
+            "id": "ap-southeast-1",
+            "names": [
+              "ap-southeast-1a",
+              "ap-southeast-1b",
+              "ap-southeast-1c"
+            ],
+            "state": "available",
+            "timeouts": null,
+            "zone_ids": [
+              "apse1-az2",
+              "apse1-az1",
+              "apse1-az3"
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "aws_caller_identity",
+      "name": "current",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "account_id": "948976368048",
+            "arn": "arn:aws:iam::948976368048:user/pragadees",
+            "id": "948976368048",
+            "user_id": "AIDA5Z43GHGYGHZNDYCKV"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_apigatewayv2_api",
+      "name": "main",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "api_endpoint": "https://3bogj0t874.execute-api.ap-southeast-1.amazonaws.com",
+            "api_key_selection_expression": "$request.header.x-api-key",
+            "arn": "arn:aws:apigateway:ap-southeast-1::/apis/3bogj0t874",
+            "body": null,
+            "cors_configuration": [
+              {
+                "allow_credentials": false,
+                "allow_headers": [
+                  "authorization",
+                  "content-type",
+                  "x-master-key"
+                ],
+                "allow_methods": [
+                  "DELETE",
+                  "GET",
+                  "OPTIONS",
+                  "PATCH",
+                  "POST",
+                  "PUT"
+                ],
+                "allow_origins": [
+                  "*"
+                ],
+                "expose_headers": [],
+                "max_age": 300
+              }
+            ],
+            "credentials_arn": null,
+            "description": "",
+            "disable_execute_api_endpoint": false,
+            "execution_arn": "arn:aws:execute-api:ap-southeast-1:948976368048:3bogj0t874",
+            "fail_on_warnings": null,
+            "id": "3bogj0t874",
+            "ip_address_type": "ipv4",
+            "name": "smartqueue-api",
+            "protocol_type": "HTTP",
+            "route_key": null,
+            "route_selection_expression": "$request.method $request.path",
+            "tags": {
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Project": "smartqueue"
+            },
+            "target": null,
+            "version": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_cloudwatch_log_group",
+      "name": "api_gw",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:logs:ap-southeast-1:948976368048:log-group:/aws/apigateway/smartqueue-api",
+            "id": "/aws/apigateway/smartqueue-api",
+            "kms_key_id": "",
+            "log_group_class": "STANDARD",
+            "name": "/aws/apigateway/smartqueue-api",
+            "name_prefix": "",
+            "retention_in_days": 7,
+            "skip_destroy": false,
+            "tags": {},
+            "tags_all": {}
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjAifQ=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "name": "mysql",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 2,
+          "attributes": {
+            "address": "smartqueue-mysql.cliwcewwcbhv.ap-southeast-1.rds.amazonaws.com",
+            "allocated_storage": 20,
+            "allow_major_version_upgrade": null,
+            "apply_immediately": null,
+            "arn": "arn:aws:rds:ap-southeast-1:948976368048:db:smartqueue-mysql",
+            "auto_minor_version_upgrade": true,
+            "availability_zone": "ap-southeast-1b",
+            "backup_retention_period": 0,
+            "backup_target": "region",
+            "backup_window": "14:43-15:13",
+            "blue_green_update": [],
+            "ca_cert_identifier": "rds-ca-rsa2048-g1",
+            "character_set_name": "",
+            "copy_tags_to_snapshot": false,
+            "custom_iam_instance_profile": "",
+            "customer_owned_ip_enabled": false,
+            "database_insights_mode": "standard",
+            "db_name": "smartqueue",
+            "db_subnet_group_name": "smartqueue-db-subnet-group",
+            "dedicated_log_volume": false,
+            "delete_automated_backups": true,
+            "deletion_protection": false,
+            "domain": "",
+            "domain_auth_secret_arn": "",
+            "domain_dns_ips": [],
+            "domain_fqdn": "",
+            "domain_iam_role_name": "",
+            "domain_ou": "",
+            "enabled_cloudwatch_logs_exports": [],
+            "endpoint": "smartqueue-mysql.cliwcewwcbhv.ap-southeast-1.rds.amazonaws.com:3306",
+            "engine": "mysql",
+            "engine_lifecycle_support": "open-source-rds-extended-support",
+            "engine_version": "8.0.45",
+            "engine_version_actual": "8.0.45",
+            "final_snapshot_identifier": null,
+            "hosted_zone_id": "Z2G0U3KFCY8NZ5",
+            "iam_database_authentication_enabled": false,
+            "id": "db-5CWVTAZJH3O6RPNNPXA57QEYY4",
+            "identifier": "smartqueue-mysql",
+            "identifier_prefix": "",
+            "instance_class": "db.t3.micro",
+            "iops": 0,
+            "kms_key_id": "",
+            "latest_restorable_time": "",
+            "license_model": "general-public-license",
+            "listener_endpoint": [],
+            "maintenance_window": "wed:18:24-wed:18:54",
+            "manage_master_user_password": null,
+            "master_user_secret": [],
+            "master_user_secret_kms_key_id": null,
+            "max_allocated_storage": 0,
+            "monitoring_interval": 0,
+            "monitoring_role_arn": "",
+            "multi_az": false,
+            "nchar_character_set_name": "",
+            "network_type": "IPV4",
+            "option_group_name": "default:mysql-8-0",
+            "parameter_group_name": "default.mysql8.0",
+            "password": null,
+            "password_wo": null,
+            "password_wo_version": null,
+            "performance_insights_enabled": false,
+            "performance_insights_kms_key_id": "",
+            "performance_insights_retention_period": 0,
+            "port": 3306,
+            "publicly_accessible": false,
+            "replica_mode": "",
+            "replicas": [],
+            "replicate_source_db": "",
+            "resource_id": "db-5CWVTAZJH3O6RPNNPXA57QEYY4",
+            "restore_to_point_in_time": [],
+            "s3_import": [],
+            "skip_final_snapshot": true,
+            "snapshot_identifier": null,
+            "status": "available",
+            "storage_encrypted": false,
+            "storage_throughput": 0,
+            "storage_type": "gp2",
+            "tags": {
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Project": "smartqueue"
+            },
+            "timeouts": null,
+            "timezone": "",
+            "upgrade_storage_config": null,
+            "username": "admin",
+            "vpc_security_group_ids": [
+              "sg-0c1bf9b3d8aca6193"
+            ]
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "password"
+              }
+            ],
+            [
+              {
+                "type": "get_attr",
+                "value": "password_wo"
+              }
+            ]
+          ],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAwLCJkZWxldGUiOjM2MDAwMDAwMDAwMDAsInVwZGF0ZSI6NDgwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMiJ9",
+          "dependencies": [
+            "aws_db_subnet_group.main",
+            "aws_security_group.lambda_sg",
+            "aws_security_group.rds_sg",
+            "aws_subnet.private_a",
+            "aws_subnet.private_b",
+            "aws_vpc.main",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_db_subnet_group",
+      "name": "main",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:rds:ap-southeast-1:948976368048:subgrp:smartqueue-db-subnet-group",
+            "description": "Managed by Terraform",
+            "id": "smartqueue-db-subnet-group",
+            "name": "smartqueue-db-subnet-group",
+            "name_prefix": "",
+            "subnet_ids": [
+              "subnet-035173e071910b85e",
+              "subnet-0faedb2d3536f31e5"
+            ],
+            "supported_network_types": [
+              "IPV4"
+            ],
+            "tags": {
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Project": "smartqueue"
+            },
+            "vpc_id": "vpc-043adf502b301781a"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_subnet.private_a",
+            "aws_subnet.private_b",
+            "aws_vpc.main",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_eip",
+      "name": "nat",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "address": null,
+            "allocation_id": "eipalloc-02481be49e7487e2d",
+            "arn": "arn:aws:ec2:ap-southeast-1:948976368048:elastic-ip/eipalloc-02481be49e7487e2d",
+            "associate_with_private_ip": null,
+            "association_id": "eipassoc-0423db956b50e62ac",
+            "carrier_ip": "",
+            "customer_owned_ip": "",
+            "customer_owned_ipv4_pool": "",
+            "domain": "vpc",
+            "id": "eipalloc-02481be49e7487e2d",
+            "instance": "",
+            "ipam_pool_id": null,
+            "network_border_group": "ap-southeast-1",
+            "network_interface": "eni-05fdb4a420a8ffec9",
+            "private_dns": "ip-10-0-3-133.ap-southeast-1.compute.internal",
+            "private_ip": "10.0.3.133",
+            "ptr_record": "",
+            "public_dns": "ec2-3-0-149-248.ap-southeast-1.compute.amazonaws.com",
+            "public_ip": "3.0.149.248",
+            "public_ipv4_pool": "amazon",
+            "tags": {
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Project": "smartqueue"
+            },
+            "timeouts": null,
+            "vpc": true
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjoxODAwMDAwMDAwMDAsInJlYWQiOjkwMDAwMDAwMDAwMCwidXBkYXRlIjozMDAwMDAwMDAwMDB9fQ=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "lambda_exec",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::948976368048:role/smartqueue-lambda-exec-role",
+            "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"lambda.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+            "create_date": "2026-04-10T08:19:31Z",
+            "description": "",
+            "force_detach_policies": false,
+            "id": "smartqueue-lambda-exec-role",
+            "inline_policy": [
+              {
+                "name": "customers-table-access",
+                "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"dynamodb:PutItem\",\"dynamodb:GetItem\",\"dynamodb:UpdateItem\",\"dynamodb:DeleteItem\",\"dynamodb:Scan\",\"dynamodb:Query\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:dynamodb:ap-southeast-1:948976368048:table/Customers\"}]}"
+              },
+              {
+                "name": "smartqueue-dynamodb-policy",
+                "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"dynamodb:PutItem\",\"dynamodb:GetItem\",\"dynamodb:UpdateItem\",\"dynamodb:DeleteItem\",\"dynamodb:Scan\",\"dynamodb:Query\"],\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:dynamodb:ap-southeast-1:948976368048:table/Orders\",\"arn:aws:dynamodb:ap-southeast-1:948976368048:table/Restaurants\",\"arn:aws:dynamodb:ap-southeast-1:948976368048:table/Users\",\"arn:aws:dynamodb:ap-southeast-1:948976368048:table/Customers\"]}]}"
+              },
+              {
+                "name": "users-table-access",
+                "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"dynamodb:PutItem\",\"dynamodb:GetItem\",\"dynamodb:UpdateItem\",\"dynamodb:DeleteItem\",\"dynamodb:Scan\",\"dynamodb:Query\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:dynamodb:ap-southeast-1:948976368048:table/Users\"}]}"
+              }
+            ],
+            "managed_policy_arns": [
+              "arn:aws:iam::948976368048:policy/smartqueue-users-table-policy",
+              "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+            ],
+            "max_session_duration": 3600,
+            "name": "smartqueue-lambda-exec-role",
+            "name_prefix": "",
+            "path": "/",
+            "permissions_boundary": "",
+            "tags": {
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Project": "smartqueue"
+            },
+            "unique_id": "AROA5Z43GHGYMAD2MVWDZ"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjAifQ=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "lambda_basic",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "smartqueue-lambda-exec-role-20260430185038475800000002",
+            "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+            "role": "smartqueue-lambda-exec-role"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_iam_role.lambda_exec"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "lambda_vpc",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "smartqueue-lambda-exec-role-20260430185038454100000001",
+            "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+            "role": "smartqueue-lambda-exec-role"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_iam_role.lambda_exec"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_internet_gateway",
+      "name": "igw",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-southeast-1:948976368048:internet-gateway/igw-0ec4b62fc5e1b3c99",
+            "id": "igw-0ec4b62fc5e1b3c99",
+            "owner_id": "948976368048",
+            "tags": {
+              "Name": "smartqueue-igw",
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Name": "smartqueue-igw",
+              "Project": "smartqueue"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-048e0486a84179350"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_lambda_function",
+      "name": "delete_restaurant",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "architectures": [
+              "x86_64"
+            ],
+            "arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-deleteRestaurant",
+            "code_sha256": "/PS9OMfoeXZOVkt13ls4Pu0O/AWK9y7TxBxBpymCNbU=",
+            "code_signing_config_arn": "",
+            "dead_letter_config": [],
+            "description": "",
+            "environment": [
+              {
+                "variables": {
+                  "JWT_SECRET": "smartqueue-secret",
+                  "MASTER_KEY": "MASTER-SMARTQUEUE-2024",
+                  "RESTAURANTS_TABLE": "Restaurants"
+                }
+              }
+            ],
+            "ephemeral_storage": [
+              {
+                "size": 512
+              }
+            ],
+            "file_system_config": [],
+            "filename": null,
+            "function_name": "smartqueue-deleteRestaurant",
+            "handler": "index.handler",
+            "id": "smartqueue-deleteRestaurant",
+            "image_config": [],
+            "image_uri": "",
+            "invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-deleteRestaurant/invocations",
+            "kms_key_arn": "",
+            "last_modified": "2026-04-12T17:30:08.000+0000",
+            "layers": [],
+            "logging_config": [
+              {
+                "application_log_level": "",
+                "log_format": "Text",
+                "log_group": "/aws/lambda/smartqueue-deleteRestaurant",
+                "system_log_level": ""
+              }
+            ],
+            "memory_size": 128,
+            "package_type": "Zip",
+            "publish": null,
+            "qualified_arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-deleteRestaurant:$LATEST",
+            "qualified_invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-deleteRestaurant:$LATEST/invocations",
+            "replace_security_groups_on_destroy": null,
+            "replacement_security_group_ids": null,
+            "reserved_concurrent_executions": -1,
+            "role": "arn:aws:iam::948976368048:role/smartqueue-lambda-exec-role",
+            "runtime": "nodejs20.x",
+            "s3_bucket": null,
+            "s3_key": null,
+            "s3_object_version": null,
+            "signing_job_arn": "",
+            "signing_profile_version_arn": "",
+            "skip_destroy": false,
+            "snap_start": [],
+            "source_code_hash": "",
+            "source_code_size": 692,
+            "tags": {
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Project": "smartqueue"
+            },
+            "timeout": 3,
+            "timeouts": null,
+            "tracing_config": [
+              {
+                "mode": "PassThrough"
+              }
+            ],
+            "version": "$LATEST",
+            "vpc_config": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMCJ9",
+          "dependencies": [
+            "aws_db_instance.mysql",
+            "aws_db_subnet_group.main",
+            "aws_iam_role.lambda_exec",
+            "aws_security_group.lambda_sg",
+            "aws_security_group.rds_sg",
+            "aws_subnet.private_a",
+            "aws_subnet.private_b",
+            "aws_vpc.main",
+            "data.archive_file.delete_restaurant_zip",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_lambda_function",
+      "name": "get_orders",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "architectures": [
+              "x86_64"
+            ],
+            "arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-getOrders",
+            "code_sha256": "j/6y9VjJ4sxdLlIgB6SkFoYv7JdxuShRVzu7FP1obUo=",
+            "code_signing_config_arn": "",
+            "dead_letter_config": [],
+            "description": "",
+            "environment": [
+              {
+                "variables": {
+                  "JWT_SECRET": "smartqueue-secret",
+                  "TABLE_NAME": "Orders"
+                }
+              }
+            ],
+            "ephemeral_storage": [
+              {
+                "size": 512
+              }
+            ],
+            "file_system_config": [],
+            "filename": null,
+            "function_name": "smartqueue-getOrders",
+            "handler": "index.handler",
+            "id": "smartqueue-getOrders",
+            "image_config": [],
+            "image_uri": "",
+            "invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-getOrders/invocations",
+            "kms_key_arn": "",
+            "last_modified": "2026-04-12T17:30:20.000+0000",
+            "layers": [],
+            "logging_config": [
+              {
+                "application_log_level": "",
+                "log_format": "Text",
+                "log_group": "/aws/lambda/smartqueue-getOrders",
+                "system_log_level": ""
+              }
+            ],
+            "memory_size": 128,
+            "package_type": "Zip",
+            "publish": null,
+            "qualified_arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-getOrders:$LATEST",
+            "qualified_invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-getOrders:$LATEST/invocations",
+            "replace_security_groups_on_destroy": null,
+            "replacement_security_group_ids": null,
+            "reserved_concurrent_executions": -1,
+            "role": "arn:aws:iam::948976368048:role/smartqueue-lambda-exec-role",
+            "runtime": "nodejs20.x",
+            "s3_bucket": null,
+            "s3_key": null,
+            "s3_object_version": null,
+            "signing_job_arn": "",
+            "signing_profile_version_arn": "",
+            "skip_destroy": false,
+            "snap_start": [],
+            "source_code_hash": "",
+            "source_code_size": 745,
+            "tags": {
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Project": "smartqueue"
+            },
+            "timeout": 3,
+            "timeouts": null,
+            "tracing_config": [
+              {
+                "mode": "PassThrough"
+              }
+            ],
+            "version": "$LATEST",
+            "vpc_config": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMCJ9",
+          "dependencies": [
+            "aws_db_instance.mysql",
+            "aws_db_subnet_group.main",
+            "aws_iam_role.lambda_exec",
+            "aws_security_group.lambda_sg",
+            "aws_security_group.rds_sg",
+            "aws_subnet.private_a",
+            "aws_subnet.private_b",
+            "aws_vpc.main",
+            "data.archive_file.get_orders_zip",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_lambda_function",
+      "name": "get_restaurant_by_id",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "architectures": [
+              "x86_64"
+            ],
+            "arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-getRestaurantById",
+            "code_sha256": "iVVUdv7VpHRi1J+39Z5NY0BAXHcN/mrf9ZjIlj3ksoY=",
+            "code_signing_config_arn": "",
+            "dead_letter_config": [],
+            "description": "",
+            "environment": [
+              {
+                "variables": {
+                  "JWT_SECRET": "smartqueue-secret",
+                  "MASTER_KEY": "MASTER-SMARTQUEUE-2024",
+                  "RESTAURANTS_TABLE": "Restaurants"
+                }
+              }
+            ],
+            "ephemeral_storage": [
+              {
+                "size": 512
+              }
+            ],
+            "file_system_config": [],
+            "filename": null,
+            "function_name": "smartqueue-getRestaurantById",
+            "handler": "index.handler",
+            "id": "smartqueue-getRestaurantById",
+            "image_config": [],
+            "image_uri": "",
+            "invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-getRestaurantById/invocations",
+            "kms_key_arn": "",
+            "last_modified": "2026-04-12T17:30:01.000+0000",
+            "layers": [],
+            "logging_config": [
+              {
+                "application_log_level": "",
+                "log_format": "Text",
+                "log_group": "/aws/lambda/smartqueue-getRestaurantById",
+                "system_log_level": ""
+              }
+            ],
+            "memory_size": 128,
+            "package_type": "Zip",
+            "publish": null,
+            "qualified_arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-getRestaurantById:$LATEST",
+            "qualified_invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-getRestaurantById:$LATEST/invocations",
+            "replace_security_groups_on_destroy": null,
+            "replacement_security_group_ids": null,
+            "reserved_concurrent_executions": -1,
+            "role": "arn:aws:iam::948976368048:role/smartqueue-lambda-exec-role",
+            "runtime": "nodejs20.x",
+            "s3_bucket": null,
+            "s3_key": null,
+            "s3_object_version": null,
+            "signing_job_arn": "",
+            "signing_profile_version_arn": "",
+            "skip_destroy": false,
+            "snap_start": [],
+            "source_code_hash": "",
+            "source_code_size": 636,
+            "tags": {
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Project": "smartqueue"
+            },
+            "timeout": 3,
+            "timeouts": null,
+            "tracing_config": [
+              {
+                "mode": "PassThrough"
+              }
+            ],
+            "version": "$LATEST",
+            "vpc_config": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMCJ9",
+          "dependencies": [
+            "aws_db_instance.mysql",
+            "aws_db_subnet_group.main",
+            "aws_iam_role.lambda_exec",
+            "aws_security_group.lambda_sg",
+            "aws_security_group.rds_sg",
+            "aws_subnet.private_a",
+            "aws_subnet.private_b",
+            "aws_vpc.main",
+            "data.archive_file.get_restaurant_by_id_zip",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_lambda_function",
+      "name": "get_restaurants",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "architectures": [
+              "x86_64"
+            ],
+            "arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-getRestaurants",
+            "code_sha256": "rZ87d4j/R6TwlDTR1bbgbBlH4uSgfXftt1TQGaWyiOc=",
+            "code_signing_config_arn": "",
+            "dead_letter_config": [],
+            "description": "",
+            "environment": [
+              {
+                "variables": {
+                  "JWT_SECRET": "smartqueue-secret",
+                  "MASTER_KEY": "MASTER-SMARTQUEUE-2024",
+                  "RESTAURANTS_TABLE": "Restaurants"
+                }
+              }
+            ],
+            "ephemeral_storage": [
+              {
+                "size": 512
+              }
+            ],
+            "file_system_config": [],
+            "filename": null,
+            "function_name": "smartqueue-getRestaurants",
+            "handler": "index.handler",
+            "id": "smartqueue-getRestaurants",
+            "image_config": [],
+            "image_uri": "",
+            "invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-getRestaurants/invocations",
+            "kms_key_arn": "",
+            "last_modified": "2026-04-30T13:29:28.000+0000",
+            "layers": [],
+            "logging_config": [
+              {
+                "application_log_level": "",
+                "log_format": "Text",
+                "log_group": "/aws/lambda/smartqueue-getRestaurants",
+                "system_log_level": ""
+              }
+            ],
+            "memory_size": 128,
+            "package_type": "Zip",
+            "publish": null,
+            "qualified_arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-getRestaurants:$LATEST",
+            "qualified_invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-getRestaurants:$LATEST/invocations",
+            "replace_security_groups_on_destroy": null,
+            "replacement_security_group_ids": null,
+            "reserved_concurrent_executions": -1,
+            "role": "arn:aws:iam::948976368048:role/smartqueue-lambda-exec-role",
+            "runtime": "nodejs20.x",
+            "s3_bucket": null,
+            "s3_key": null,
+            "s3_object_version": null,
+            "signing_job_arn": "",
+            "signing_profile_version_arn": "",
+            "skip_destroy": false,
+            "snap_start": [],
+            "source_code_hash": "",
+            "source_code_size": 695,
+            "tags": {
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Project": "smartqueue"
+            },
+            "timeout": 3,
+            "timeouts": null,
+            "tracing_config": [
+              {
+                "mode": "PassThrough"
+              }
+            ],
+            "version": "$LATEST",
+            "vpc_config": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMCJ9",
+          "dependencies": [
+            "aws_db_instance.mysql",
+            "aws_db_subnet_group.main",
+            "aws_iam_role.lambda_exec",
+            "aws_security_group.lambda_sg",
+            "aws_security_group.rds_sg",
+            "aws_subnet.private_a",
+            "aws_subnet.private_b",
+            "aws_vpc.main",
+            "data.archive_file.get_restaurants_zip",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_lambda_function",
+      "name": "login",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "architectures": [
+              "x86_64"
+            ],
+            "arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-login",
+            "code_sha256": "P6TTLLHFWev84KlTH2jy29ziZuZ0vqAHqWOlO3SH3Vk=",
+            "code_signing_config_arn": "",
+            "dead_letter_config": [],
+            "description": "",
+            "environment": [
+              {
+                "variables": {
+                  "JWT_SECRET": "smartqueue-secret",
+                  "RESTAURANTS_TABLE": "Restaurants",
+                  "USERS_TABLE": "Users"
+                }
+              }
+            ],
+            "ephemeral_storage": [
+              {
+                "size": 512
+              }
+            ],
+            "file_system_config": [],
+            "filename": null,
+            "function_name": "smartqueue-login",
+            "handler": "index.handler",
+            "id": "smartqueue-login",
+            "image_config": [],
+            "image_uri": "",
+            "invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-login/invocations",
+            "kms_key_arn": "",
+            "last_modified": "2026-04-30T13:29:27.000+0000",
+            "layers": [],
+            "logging_config": [
+              {
+                "application_log_level": "",
+                "log_format": "Text",
+                "log_group": "/aws/lambda/smartqueue-login",
+                "system_log_level": ""
+              }
+            ],
+            "memory_size": 128,
+            "package_type": "Zip",
+            "publish": null,
+            "qualified_arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-login:$LATEST",
+            "qualified_invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-login:$LATEST/invocations",
+            "replace_security_groups_on_destroy": null,
+            "replacement_security_group_ids": null,
+            "reserved_concurrent_executions": -1,
+            "role": "arn:aws:iam::948976368048:role/smartqueue-lambda-exec-role",
+            "runtime": "nodejs20.x",
+            "s3_bucket": null,
+            "s3_key": null,
+            "s3_object_version": null,
+            "signing_job_arn": "",
+            "signing_profile_version_arn": "",
+            "skip_destroy": false,
+            "snap_start": [],
+            "source_code_hash": "",
+            "source_code_size": 1151,
+            "tags": {
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Project": "smartqueue"
+            },
+            "timeout": 3,
+            "timeouts": null,
+            "tracing_config": [
+              {
+                "mode": "PassThrough"
+              }
+            ],
+            "version": "$LATEST",
+            "vpc_config": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMCJ9",
+          "dependencies": [
+            "aws_db_instance.mysql",
+            "aws_db_subnet_group.main",
+            "aws_iam_role.lambda_exec",
+            "aws_security_group.lambda_sg",
+            "aws_security_group.rds_sg",
+            "aws_subnet.private_a",
+            "aws_subnet.private_b",
+            "aws_vpc.main",
+            "data.archive_file.login_zip",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_lambda_function",
+      "name": "place_order",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "architectures": [
+              "x86_64"
+            ],
+            "arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-placeOrder",
+            "code_sha256": "u8aAsbATtjLr+FRadjuemw31Ab0R0E3IakY76nBVWvo=",
+            "code_signing_config_arn": "",
+            "dead_letter_config": [],
+            "description": "",
+            "environment": [
+              {
+                "variables": {
+                  "JWT_SECRET": "smartqueue-secret",
+                  "TABLE_NAME": "Orders"
+                }
+              }
+            ],
+            "ephemeral_storage": [
+              {
+                "size": 512
+              }
+            ],
+            "file_system_config": [],
+            "filename": null,
+            "function_name": "smartqueue-placeOrder",
+            "handler": "index.handler",
+            "id": "smartqueue-placeOrder",
+            "image_config": [],
+            "image_uri": "",
+            "invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-placeOrder/invocations",
+            "kms_key_arn": "",
+            "last_modified": "2026-04-15T10:21:57.000+0000",
+            "layers": [],
+            "logging_config": [
+              {
+                "application_log_level": "",
+                "log_format": "Text",
+                "log_group": "/aws/lambda/smartqueue-placeOrder",
+                "system_log_level": ""
+              }
+            ],
+            "memory_size": 128,
+            "package_type": "Zip",
+            "publish": null,
+            "qualified_arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-placeOrder:$LATEST",
+            "qualified_invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-placeOrder:$LATEST/invocations",
+            "replace_security_groups_on_destroy": null,
+            "replacement_security_group_ids": null,
+            "reserved_concurrent_executions": -1,
+            "role": "arn:aws:iam::948976368048:role/smartqueue-lambda-exec-role",
+            "runtime": "nodejs20.x",
+            "s3_bucket": null,
+            "s3_key": null,
+            "s3_object_version": null,
+            "signing_job_arn": "",
+            "signing_profile_version_arn": "",
+            "skip_destroy": false,
+            "snap_start": [],
+            "source_code_hash": "",
+            "source_code_size": 1090,
+            "tags": {
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Project": "smartqueue"
+            },
+            "timeout": 3,
+            "timeouts": null,
+            "tracing_config": [
+              {
+                "mode": "PassThrough"
+              }
+            ],
+            "version": "$LATEST",
+            "vpc_config": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMCJ9",
+          "dependencies": [
+            "aws_db_instance.mysql",
+            "aws_db_subnet_group.main",
+            "aws_iam_role.lambda_exec",
+            "aws_security_group.lambda_sg",
+            "aws_security_group.rds_sg",
+            "aws_subnet.private_a",
+            "aws_subnet.private_b",
+            "aws_vpc.main",
+            "data.archive_file.place_order_zip",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_lambda_function",
+      "name": "register",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "architectures": [
+              "x86_64"
+            ],
+            "arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-register",
+            "code_sha256": "npJ4UfEGFj1A70ixp18k+7tnMKw27Os7yc+2LVupT+0=",
+            "code_signing_config_arn": "",
+            "dead_letter_config": [],
+            "description": "",
+            "environment": [
+              {
+                "variables": {
+                  "JWT_SECRET": "smartqueue-secret",
+                  "RESTAURANTS_TABLE": "Restaurants",
+                  "USERS_TABLE": "Users"
+                }
+              }
+            ],
+            "ephemeral_storage": [
+              {
+                "size": 512
+              }
+            ],
+            "file_system_config": [],
+            "filename": null,
+            "function_name": "smartqueue-register",
+            "handler": "index.handler",
+            "id": "smartqueue-register",
+            "image_config": [],
+            "image_uri": "",
+            "invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-register/invocations",
+            "kms_key_arn": "",
+            "last_modified": "2026-04-30T13:29:27.000+0000",
+            "layers": [],
+            "logging_config": [
+              {
+                "application_log_level": "",
+                "log_format": "Text",
+                "log_group": "/aws/lambda/smartqueue-register",
+                "system_log_level": ""
+              }
+            ],
+            "memory_size": 128,
+            "package_type": "Zip",
+            "publish": null,
+            "qualified_arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-register:$LATEST",
+            "qualified_invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-register:$LATEST/invocations",
+            "replace_security_groups_on_destroy": null,
+            "replacement_security_group_ids": null,
+            "reserved_concurrent_executions": -1,
+            "role": "arn:aws:iam::948976368048:role/smartqueue-lambda-exec-role",
+            "runtime": "nodejs20.x",
+            "s3_bucket": null,
+            "s3_key": null,
+            "s3_object_version": null,
+            "signing_job_arn": "",
+            "signing_profile_version_arn": "",
+            "skip_destroy": false,
+            "snap_start": [],
+            "source_code_hash": "",
+            "source_code_size": 1186,
+            "tags": {
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Project": "smartqueue"
+            },
+            "timeout": 3,
+            "timeouts": null,
+            "tracing_config": [
+              {
+                "mode": "PassThrough"
+              }
+            ],
+            "version": "$LATEST",
+            "vpc_config": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMCJ9",
+          "dependencies": [
+            "aws_db_instance.mysql",
+            "aws_db_subnet_group.main",
+            "aws_iam_role.lambda_exec",
+            "aws_security_group.lambda_sg",
+            "aws_security_group.rds_sg",
+            "aws_subnet.private_a",
+            "aws_subnet.private_b",
+            "aws_vpc.main",
+            "data.archive_file.register_zip",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_lambda_function",
+      "name": "update_order",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "architectures": [
+              "x86_64"
+            ],
+            "arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-updateOrder",
+            "code_sha256": "IIfi3t1qvnwXrRLzk6WdWgjoSfuRMa01PjgQ+tmM3WU=",
+            "code_signing_config_arn": "",
+            "dead_letter_config": [],
+            "description": "",
+            "environment": [
+              {
+                "variables": {
+                  "JWT_SECRET": "smartqueue-secret",
+                  "TABLE_NAME": "Orders"
+                }
+              }
+            ],
+            "ephemeral_storage": [
+              {
+                "size": 512
+              }
+            ],
+            "file_system_config": [],
+            "filename": null,
+            "function_name": "smartqueue-updateOrder",
+            "handler": "index.handler",
+            "id": "smartqueue-updateOrder",
+            "image_config": [],
+            "image_uri": "",
+            "invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-updateOrder/invocations",
+            "kms_key_arn": "",
+            "last_modified": "2026-04-12T17:29:42.000+0000",
+            "layers": [],
+            "logging_config": [
+              {
+                "application_log_level": "",
+                "log_format": "Text",
+                "log_group": "/aws/lambda/smartqueue-updateOrder",
+                "system_log_level": ""
+              }
+            ],
+            "memory_size": 128,
+            "package_type": "Zip",
+            "publish": null,
+            "qualified_arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-updateOrder:$LATEST",
+            "qualified_invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-updateOrder:$LATEST/invocations",
+            "replace_security_groups_on_destroy": null,
+            "replacement_security_group_ids": null,
+            "reserved_concurrent_executions": -1,
+            "role": "arn:aws:iam::948976368048:role/smartqueue-lambda-exec-role",
+            "runtime": "nodejs20.x",
+            "s3_bucket": null,
+            "s3_key": null,
+            "s3_object_version": null,
+            "signing_job_arn": "",
+            "signing_profile_version_arn": "",
+            "skip_destroy": false,
+            "snap_start": [],
+            "source_code_hash": "",
+            "source_code_size": 1214,
+            "tags": {
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Project": "smartqueue"
+            },
+            "timeout": 3,
+            "timeouts": null,
+            "tracing_config": [
+              {
+                "mode": "PassThrough"
+              }
+            ],
+            "version": "$LATEST",
+            "vpc_config": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMCJ9",
+          "dependencies": [
+            "aws_db_instance.mysql",
+            "aws_db_subnet_group.main",
+            "aws_iam_role.lambda_exec",
+            "aws_security_group.lambda_sg",
+            "aws_security_group.rds_sg",
+            "aws_subnet.private_a",
+            "aws_subnet.private_b",
+            "aws_vpc.main",
+            "data.archive_file.update_order_zip",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_lambda_function",
+      "name": "update_restaurant",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "architectures": [
+              "x86_64"
+            ],
+            "arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-updateRestaurant",
+            "code_sha256": "G0jB7VH0t5lOgimUTVrkLVN/KVN9GYc0vD20dlx8OVA=",
+            "code_signing_config_arn": "",
+            "dead_letter_config": [],
+            "description": "",
+            "environment": [
+              {
+                "variables": {
+                  "JWT_SECRET": "smartqueue-secret",
+                  "MASTER_KEY": "MASTER-SMARTQUEUE-2024",
+                  "RESTAURANTS_TABLE": "Restaurants"
+                }
+              }
+            ],
+            "ephemeral_storage": [
+              {
+                "size": 512
+              }
+            ],
+            "file_system_config": [],
+            "filename": null,
+            "function_name": "smartqueue-updateRestaurant",
+            "handler": "index.handler",
+            "id": "smartqueue-updateRestaurant",
+            "image_config": [],
+            "image_uri": "",
+            "invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-updateRestaurant/invocations",
+            "kms_key_arn": "",
+            "last_modified": "2026-04-16T04:29:33.000+0000",
+            "layers": [],
+            "logging_config": [
+              {
+                "application_log_level": "",
+                "log_format": "Text",
+                "log_group": "/aws/lambda/smartqueue-updateRestaurant",
+                "system_log_level": ""
+              }
+            ],
+            "memory_size": 128,
+            "package_type": "Zip",
+            "publish": null,
+            "qualified_arn": "arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-updateRestaurant:$LATEST",
+            "qualified_invoke_arn": "arn:aws:apigateway:ap-southeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-southeast-1:948976368048:function:smartqueue-updateRestaurant:$LATEST/invocations",
+            "replace_security_groups_on_destroy": null,
+            "replacement_security_group_ids": null,
+            "reserved_concurrent_executions": -1,
+            "role": "arn:aws:iam::948976368048:role/smartqueue-lambda-exec-role",
+            "runtime": "nodejs20.x",
+            "s3_bucket": null,
+            "s3_key": null,
+            "s3_object_version": null,
+            "signing_job_arn": "",
+            "signing_profile_version_arn": "",
+            "skip_destroy": false,
+            "snap_start": [],
+            "source_code_hash": "",
+            "source_code_size": 1504,
+            "tags": {
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Project": "smartqueue"
+            },
+            "timeout": 3,
+            "timeouts": null,
+            "tracing_config": [
+              {
+                "mode": "PassThrough"
+              }
+            ],
+            "version": "$LATEST",
+            "vpc_config": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMCJ9",
+          "dependencies": [
+            "aws_db_instance.mysql",
+            "aws_db_subnet_group.main",
+            "aws_iam_role.lambda_exec",
+            "aws_security_group.lambda_sg",
+            "aws_security_group.rds_sg",
+            "aws_subnet.private_a",
+            "aws_subnet.private_b",
+            "aws_vpc.main",
+            "data.archive_file.update_restaurant_zip",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_nat_gateway",
+      "name": "nat",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "allocation_id": "eipalloc-02481be49e7487e2d",
+            "association_id": "eipassoc-0423db956b50e62ac",
+            "connectivity_type": "public",
+            "id": "nat-041eeb5414d9bcf64",
+            "network_interface_id": "eni-05fdb4a420a8ffec9",
+            "private_ip": "10.0.3.133",
+            "public_ip": "3.0.149.248",
+            "secondary_allocation_ids": [],
+            "secondary_private_ip_address_count": 0,
+            "secondary_private_ip_addresses": [],
+            "subnet_id": "subnet-0b0965e59474e644a",
+            "tags": {
+              "Name": "smartqueue-nat",
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Name": "smartqueue-nat",
+              "Project": "smartqueue"
+            },
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTgwMDAwMDAwMDAwMCwidXBkYXRlIjo2MDAwMDAwMDAwMDB9fQ==",
+          "dependencies": [
+            "aws_eip.nat",
+            "aws_internet_gateway.igw",
+            "aws_subnet.public_a",
+            "aws_vpc.main",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_route_table",
+      "name": "private",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-southeast-1:948976368048:route-table/rtb-04bdb02c69b231fe8",
+            "id": "rtb-04bdb02c69b231fe8",
+            "owner_id": "948976368048",
+            "propagating_vgws": [],
+            "route": [
+              {
+                "carrier_gateway_id": "",
+                "cidr_block": "0.0.0.0/0",
+                "core_network_arn": "",
+                "destination_prefix_list_id": "",
+                "egress_only_gateway_id": "",
+                "gateway_id": "",
+                "ipv6_cidr_block": "",
+                "local_gateway_id": "",
+                "nat_gateway_id": "nat-041eeb5414d9bcf64",
+                "network_interface_id": "",
+                "transit_gateway_id": "",
+                "vpc_endpoint_id": "",
+                "vpc_peering_connection_id": ""
+              }
+            ],
+            "tags": {
+              "Name": "smartqueue-private-rt",
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Name": "smartqueue-private-rt",
+              "Project": "smartqueue"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-048e0486a84179350"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "aws_eip.nat",
+            "aws_internet_gateway.igw",
+            "aws_nat_gateway.nat",
+            "aws_subnet.public_a",
+            "aws_vpc.main",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_route_table",
+      "name": "public",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-southeast-1:948976368048:route-table/rtb-03855ad5550695900",
+            "id": "rtb-03855ad5550695900",
+            "owner_id": "948976368048",
+            "propagating_vgws": [],
+            "route": [
+              {
+                "carrier_gateway_id": "",
+                "cidr_block": "0.0.0.0/0",
+                "core_network_arn": "",
+                "destination_prefix_list_id": "",
+                "egress_only_gateway_id": "",
+                "gateway_id": "igw-0ec4b62fc5e1b3c99",
+                "ipv6_cidr_block": "",
+                "local_gateway_id": "",
+                "nat_gateway_id": "",
+                "network_interface_id": "",
+                "transit_gateway_id": "",
+                "vpc_endpoint_id": "",
+                "vpc_peering_connection_id": ""
+              }
+            ],
+            "tags": {
+              "Name": "smartqueue-public-rt",
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Name": "smartqueue-public-rt",
+              "Project": "smartqueue"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-048e0486a84179350"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "aws_internet_gateway.igw",
+            "aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_route_table_association",
+      "name": "private_a",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "gateway_id": "",
+            "id": "rtbassoc-0aa295fe4a306cf25",
+            "route_table_id": "rtb-04bdb02c69b231fe8",
+            "subnet_id": "subnet-0faedb2d3536f31e5",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "aws_eip.nat",
+            "aws_internet_gateway.igw",
+            "aws_nat_gateway.nat",
+            "aws_route_table.private",
+            "aws_subnet.private_a",
+            "aws_subnet.public_a",
+            "aws_vpc.main",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_route_table_association",
+      "name": "private_b",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "gateway_id": "",
+            "id": "rtbassoc-0aa9b6bb2b746b934",
+            "route_table_id": "rtb-04bdb02c69b231fe8",
+            "subnet_id": "subnet-035173e071910b85e",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "aws_eip.nat",
+            "aws_internet_gateway.igw",
+            "aws_nat_gateway.nat",
+            "aws_route_table.private",
+            "aws_subnet.private_b",
+            "aws_subnet.public_a",
+            "aws_vpc.main",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_route_table_association",
+      "name": "public_a",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "gateway_id": "",
+            "id": "rtbassoc-01e960564bced697c",
+            "route_table_id": "rtb-03855ad5550695900",
+            "subnet_id": "subnet-0b0965e59474e644a",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "aws_internet_gateway.igw",
+            "aws_route_table.public",
+            "aws_subnet.public_a",
+            "aws_vpc.main",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "lambda_sg",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-southeast-1:948976368048:security-group/sg-0da4db2f1691d0548",
+            "description": "Lambda functions security group",
+            "egress": [
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "",
+                "from_port": 0,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "-1",
+                "security_groups": [],
+                "self": false,
+                "to_port": 0
+              }
+            ],
+            "id": "sg-0da4db2f1691d0548",
+            "ingress": [],
+            "name": "smartqueue-lambda-sg",
+            "name_prefix": "",
+            "owner_id": "948976368048",
+            "revoke_rules_on_delete": false,
+            "tags": {
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Project": "smartqueue"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-048e0486a84179350"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
+          "dependencies": [
+            "aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "rds_sg",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-southeast-1:948976368048:security-group/sg-0d60ed4034f3f9e83",
+            "description": "RDS MySQL security group",
+            "egress": [
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "",
+                "from_port": 0,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "-1",
+                "security_groups": [],
+                "self": false,
+                "to_port": 0
+              }
+            ],
+            "id": "sg-0d60ed4034f3f9e83",
+            "ingress": [
+              {
+                "cidr_blocks": [],
+                "description": "",
+                "from_port": 3306,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [
+                  "sg-0da4db2f1691d0548"
+                ],
+                "self": false,
+                "to_port": 3306
+              }
+            ],
+            "name": "smartqueue-rds-sg",
+            "name_prefix": "",
+            "owner_id": "948976368048",
+            "revoke_rules_on_delete": false,
+            "tags": {
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Project": "smartqueue"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-048e0486a84179350"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
+          "dependencies": [
+            "aws_security_group.lambda_sg",
+            "aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "private_a",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-southeast-1:948976368048:subnet/subnet-0faedb2d3536f31e5",
+            "assign_ipv6_address_on_creation": false,
+            "availability_zone": "ap-southeast-1a",
+            "availability_zone_id": "apse1-az2",
+            "cidr_block": "10.0.1.0/24",
+            "customer_owned_ipv4_pool": "",
+            "enable_dns64": false,
+            "enable_lni_at_device_index": 0,
+            "enable_resource_name_dns_a_record_on_launch": false,
+            "enable_resource_name_dns_aaaa_record_on_launch": false,
+            "id": "subnet-0faedb2d3536f31e5",
+            "ipv6_cidr_block": "",
+            "ipv6_cidr_block_association_id": "",
+            "ipv6_native": false,
+            "map_customer_owned_ip_on_launch": false,
+            "map_public_ip_on_launch": false,
+            "outpost_arn": "",
+            "owner_id": "948976368048",
+            "private_dns_hostname_type_on_launch": "ip-name",
+            "tags": {
+              "Name": "smartqueue-private-a",
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Name": "smartqueue-private-a",
+              "Project": "smartqueue"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-048e0486a84179350"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "aws_vpc.main",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "private_b",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-southeast-1:948976368048:subnet/subnet-035173e071910b85e",
+            "assign_ipv6_address_on_creation": false,
+            "availability_zone": "ap-southeast-1b",
+            "availability_zone_id": "apse1-az1",
+            "cidr_block": "10.0.2.0/24",
+            "customer_owned_ipv4_pool": "",
+            "enable_dns64": false,
+            "enable_lni_at_device_index": 0,
+            "enable_resource_name_dns_a_record_on_launch": false,
+            "enable_resource_name_dns_aaaa_record_on_launch": false,
+            "id": "subnet-035173e071910b85e",
+            "ipv6_cidr_block": "",
+            "ipv6_cidr_block_association_id": "",
+            "ipv6_native": false,
+            "map_customer_owned_ip_on_launch": false,
+            "map_public_ip_on_launch": false,
+            "outpost_arn": "",
+            "owner_id": "948976368048",
+            "private_dns_hostname_type_on_launch": "ip-name",
+            "tags": {
+              "Name": "smartqueue-private-b",
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Name": "smartqueue-private-b",
+              "Project": "smartqueue"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-048e0486a84179350"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "aws_vpc.main",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "public_a",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-southeast-1:948976368048:subnet/subnet-0b0965e59474e644a",
+            "assign_ipv6_address_on_creation": false,
+            "availability_zone": "ap-southeast-1a",
+            "availability_zone_id": "apse1-az2",
+            "cidr_block": "10.0.3.0/24",
+            "customer_owned_ipv4_pool": "",
+            "enable_dns64": false,
+            "enable_lni_at_device_index": 0,
+            "enable_resource_name_dns_a_record_on_launch": false,
+            "enable_resource_name_dns_aaaa_record_on_launch": false,
+            "id": "subnet-0b0965e59474e644a",
+            "ipv6_cidr_block": "",
+            "ipv6_cidr_block_association_id": "",
+            "ipv6_native": false,
+            "map_customer_owned_ip_on_launch": false,
+            "map_public_ip_on_launch": true,
+            "outpost_arn": "",
+            "owner_id": "948976368048",
+            "private_dns_hostname_type_on_launch": "ip-name",
+            "tags": {
+              "Name": "smartqueue-public-a",
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Name": "smartqueue-public-a",
+              "Project": "smartqueue"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-048e0486a84179350"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "aws_vpc.main",
+            "data.aws_availability_zones.available"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_vpc",
+      "name": "main",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-southeast-1:948976368048:vpc/vpc-048e0486a84179350",
+            "assign_generated_ipv6_cidr_block": false,
+            "cidr_block": "10.0.0.0/16",
+            "default_network_acl_id": "acl-0976f31443b0d6033",
+            "default_route_table_id": "rtb-0848fe5f5c2a1737b",
+            "default_security_group_id": "sg-0c5398d1c40520aed",
+            "dhcp_options_id": "dopt-0d4994c713516ef95",
+            "enable_dns_hostnames": true,
+            "enable_dns_support": true,
+            "enable_network_address_usage_metrics": false,
+            "id": "vpc-048e0486a84179350",
+            "instance_tenancy": "default",
+            "ipv4_ipam_pool_id": null,
+            "ipv4_netmask_length": null,
+            "ipv6_association_id": "",
+            "ipv6_cidr_block": "",
+            "ipv6_cidr_block_network_border_group": "",
+            "ipv6_ipam_pool_id": "",
+            "ipv6_netmask_length": 0,
+            "main_route_table_id": "rtb-0848fe5f5c2a1737b",
+            "owner_id": "948976368048",
+            "tags": {
+              "Name": "smartqueue-vpc",
+              "Project": "smartqueue"
+            },
+            "tags_all": {
+              "Name": "smartqueue-vpc",
+              "Project": "smartqueue"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ=="
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

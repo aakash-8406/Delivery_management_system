@@ -1,32 +1,35 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, DeleteCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
-
-const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
-const TABLE  = process.env.RESTAURANTS_TABLE;
-const MASTER = process.env.MASTER_KEY;
+import mysql from "mysql2/promise";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type,Authorization",
+  "Access-Control-Allow-Headers": "Content-Type,Authorization,x-master-key",
   "Content-Type": "application/json",
 };
 
-export const handler = async (event) => {
-  try {
-    const restaurantId = event.pathParameters?.id;
-    const masterKey    = event.headers?.["x-master-key"] ?? event.headers?.["X-Master-Key"];
+const MASTER_KEY = process.env.MASTER_KEY ?? "MASTER-SMARTQUEUE-2024";
 
-    if (!masterKey || masterKey !== MASTER)
+const getConn = () => mysql.createConnection({
+  host: process.env.DB_HOST, port: Number(process.env.DB_PORT) || 3306,
+  user: process.env.DB_USER, password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
+
+export const handler = async (event) => {
+  const conn = await getConn();
+  try {
+    const masterKey = event.headers?.["x-master-key"] ?? event.headers?.["X-Master-Key"];
+    if (masterKey !== MASTER_KEY)
       return { statusCode: 403, headers: cors, body: JSON.stringify({ error: "Invalid master key" }) };
 
-    if (!restaurantId)
-      return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "restaurantId required" }) };
+    const id = event.pathParameters?.id;
+    if (!id) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "id required" }) };
 
-    await client.send(new DeleteCommand({ TableName: TABLE, Key: { restaurantId } }));
-
-    return { statusCode: 200, headers: cors, body: JSON.stringify({ data: { deleted: restaurantId } }) };
+    await conn.execute("DELETE FROM restaurants WHERE restaurantId = ?", [id]);
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ message: "Restaurant deleted" }) };
   } catch (err) {
     console.error(err);
     return { statusCode: 500, headers: cors, body: JSON.stringify({ error: err.message }) };
+  } finally {
+    await conn.end();
   }
 };

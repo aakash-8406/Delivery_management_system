@@ -2,11 +2,12 @@ pipeline {
   agent any
 
   environment {
-    DOCKERHUB_USER   = "aakash985"   
+    DOCKERHUB_USER   = "aakash985"
     CUSTOMER_IMAGE   = "${DOCKERHUB_USER}/bitrush-customer"
     RESTAURANT_IMAGE = "${DOCKERHUB_USER}/smartqueue-restaurant"
     IMAGE_TAG        = "${BUILD_NUMBER}"
     K8S_NAMESPACE    = "smartqueue"
+    API_GATEWAY_URL  = "https://3bogj0t874.execute-api.ap-southeast-1.amazonaws.com"
   }
 
   stages {
@@ -19,80 +20,61 @@ pipeline {
       }
     }
 
-    // ── 2. Deploy Lambda ─────────────────────────────────────────────────────
+    // ── 2. Deploy Lambda (MySQL code) ─────────────────────────────────────────
     stage('Deploy Lambda') {
       steps {
         withCredentials([
           string(credentialsId: 'AWS_ACCESS_KEY_ID',     variable: 'AWS_ACCESS_KEY_ID'),
           string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY'),
-          string(credentialsId: 'AWS_REGION',            variable: 'AWS_DEFAULT_REGION')
+          string(credentialsId: 'AWS_REGION',            variable: 'AWS_DEFAULT_REGION'),
+          string(credentialsId: 'DB_PASSWORD',           variable: 'DB_PASSWORD'),
+          string(credentialsId: 'MASTER_KEY',            variable: 'MASTER_KEY')
         ]) {
           sh """
-            # Update Lambda env vars
-            aws lambda update-function-configuration \
-              --function-name smartqueue-register \
-              --environment "Variables={USERS_TABLE=Users,RESTAURANTS_TABLE=Restaurants,JWT_SECRET=smartqueue-secret}" \
-              --region \${AWS_DEFAULT_REGION}
-            aws lambda wait function-updated --function-name smartqueue-register --region \${AWS_DEFAULT_REGION}
+            LAMBDA_DIR=deliver_management_system/infra/lambda
+            DB_HOST=smartqueue-mysql.cliwcewwcbhv.ap-southeast-1.rds.amazonaws.com
 
-            aws lambda update-function-configuration \
-              --function-name smartqueue-login \
-              --environment "Variables={USERS_TABLE=Users,RESTAURANTS_TABLE=Restaurants,JWT_SECRET=smartqueue-secret}" \
-              --region \${AWS_DEFAULT_REGION}
-            aws lambda wait function-updated --function-name smartqueue-login --region \${AWS_DEFAULT_REGION}
-
-            aws lambda update-function-configuration \
-              --function-name smartqueue-customerRegister \
-              --environment "Variables={CUSTOMERS_TABLE=Customers}" \
-              --region \${AWS_DEFAULT_REGION} || true
-            aws lambda update-function-configuration \
-              --function-name smartqueue-customerLogin \
-              --environment "Variables={CUSTOMERS_TABLE=Customers}" \
-              --region \${AWS_DEFAULT_REGION} || true
-
-            # Deploy Lambda code
-            cd deliver_management_system/infra/lambda/register
-            zip -j register.zip index.mjs
-            aws lambda update-function-code --function-name smartqueue-register --zip-file fileb://register.zip --region \${AWS_DEFAULT_REGION}
-            rm register.zip
-
-            cd ../login
-            zip -j login.zip index.mjs
-            aws lambda update-function-code --function-name smartqueue-login --zip-file fileb://login.zip --region \${AWS_DEFAULT_REGION}
-            rm login.zip
-
-            cd ../getRestaurants
-            zip -j getRestaurants.zip index.mjs
-            aws lambda update-function-code --function-name smartqueue-getRestaurants --zip-file fileb://getRestaurants.zip --region \${AWS_DEFAULT_REGION}
-            rm getRestaurants.zip
-
-            cd ../customerRegister
-            zip -j customerRegister.zip index.mjs
-            aws lambda update-function-code --function-name smartqueue-customerRegister --zip-file fileb://customerRegister.zip --region \${AWS_DEFAULT_REGION}
-            rm customerRegister.zip
-
-            cd ../customerLogin
-            zip -j customerLogin.zip index.mjs
-            aws lambda update-function-code --function-name smartqueue-customerLogin --zip-file fileb://customerLogin.zip --region \${AWS_DEFAULT_REGION}
-            rm customerLogin.zip
+            # Install mysql2 deps and zip+deploy each Lambda
+            for fn in getRestaurants getRestaurantById login register placeOrder getOrders updateOrder deleteRestaurant updateRestaurant; do
+              echo "--- Deploying \$fn ---"
+              cd \$LAMBDA_DIR/\$fn
+              npm install --omit=dev --silent
+              zip -r \${fn}.zip . -x "*.log" "package-lock.json"
+              aws lambda update-function-code \\
+                --function-name smartqueue-\$fn \\
+                --zip-file fileb://\${fn}.zip \\
+                --region \${AWS_DEFAULT_REGION} > /dev/null
+              aws lambda wait function-updated \\
+                --function-name smartqueue-\$fn \\
+                --region \${AWS_DEFAULT_REGION}
+              # Update env vars with RDS connection
+              aws lambda update-function-configuration \\
+                --function-name smartqueue-\$fn \\
+                --environment "Variables={DB_HOST=\$DB_HOST,DB_PORT=3306,DB_NAME=smartqueue,DB_USER=admin,DB_PASSWORD=\${DB_PASSWORD},JWT_SECRET=smartqueue-secret,MASTER_KEY=\${MASTER_KEY}}" \\
+                --region \${AWS_DEFAULT_REGION} > /dev/null
+              aws lambda wait function-updated \\
+                --function-name smartqueue-\$fn \\
+                --region \${AWS_DEFAULT_REGION}
+              rm \${fn}.zip
+              cd -
+            done
           """
         }
       }
     }
 
-    // ── 3. Build — secrets injected from Jenkins Credentials ─────────────────
+    // ── 3. Build Docker Images ────────────────────────────────────────────────
     stage('Build Images') {
       parallel {
 
         stage('customer-app') {
           steps {
             withCredentials([
-              string(credentialsId: 'API_GATEWAY_URL', variable: 'API_URL'),
-              string(credentialsId: 'MASTER_KEY',      variable: 'MKEY')
+              string(credentialsId: 'MASTER_KEY', variable: 'MKEY')
             ]) {
               sh """
                 docker build \\
-                  --build-arg VITE_API_URL=\${API_URL} \\
+                  --build-arg VITE_API_URL=${API_GATEWAY_URL} \\
                   --build-arg VITE_MASTER_KEY=\${MKEY} \\
                   -t ${CUSTOMER_IMAGE}:${IMAGE_TAG} \\
                   -t ${CUSTOMER_IMAGE}:latest \\
@@ -105,12 +87,11 @@ pipeline {
         stage('restaurant-app') {
           steps {
             withCredentials([
-              string(credentialsId: 'API_GATEWAY_URL', variable: 'API_URL'),
-              string(credentialsId: 'MASTER_KEY',      variable: 'MKEY')
+              string(credentialsId: 'MASTER_KEY', variable: 'MKEY')
             ]) {
               sh """
                 docker build \\
-                  --build-arg VITE_API_URL=\${API_URL} \\
+                  --build-arg VITE_API_URL=${API_GATEWAY_URL} \\
                   --build-arg VITE_MASTER_KEY=\${MKEY} \\
                   -t ${RESTAURANT_IMAGE}:${IMAGE_TAG} \\
                   -t ${RESTAURANT_IMAGE}:latest \\
@@ -160,7 +141,7 @@ pipeline {
       }
     }
 
-    // ── 6. Verify rollout ────────────────────────────────────────────────────
+    // ── 6. Verify Rollout ────────────────────────────────────────────────────
     stage('Verify Rollout') {
       steps {
         sh """
@@ -186,16 +167,17 @@ pipeline {
       sh """
         EC2_IP=\$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null || echo 'YOUR_EC2_IP')
         echo "============================================"
-        echo "✅  BUILD #${BUILD_NUMBER} DEPLOYED"
+        echo "BUILD #${BUILD_NUMBER} DEPLOYED"
         echo "--------------------------------------------"
-        echo "customer-app   → http://\${EC2_IP}:30174"
-        echo "restaurant-app → http://\${EC2_IP}:30175"
+        echo "customer-app   -> http://\${EC2_IP}:30174"
+        echo "restaurant-app -> http://\${EC2_IP}:30175"
+        echo "API Gateway    -> ${API_GATEWAY_URL}"
         echo "============================================"
       """
     }
     failure {
       sh """
-        echo "❌ Build failed — rolling back"
+        echo "Build failed - rolling back"
         kubectl rollout undo deployment/customer-app   -n ${K8S_NAMESPACE} || true
         kubectl rollout undo deployment/restaurant-app -n ${K8S_NAMESPACE} || true
       """

@@ -9,136 +9,17 @@ terraform {
       source  = "hashicorp/archive"
       version = "~> 2.0"
     }
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.0"
+    }
   }
 }
 
 provider "aws" { region = var.aws_region }
 
 data "aws_caller_identity" "current" {}
-
-# ─── Cognito ──────────────────────────────────────────────────────────────────
-
-resource "aws_cognito_user_pool" "customers" {
-  name = var.cognito_customer_pool_name
-  auto_verified_attributes = ["email"]
-  username_attributes      = ["email"]
-
-  password_policy {
-    minimum_length    = 8
-    require_numbers   = true
-    require_symbols   = false
-    require_uppercase = false
-    require_lowercase = false
-  }
-
-  schema {
-    name                = "name"
-    attribute_data_type = "String"
-    mutable             = true
-    required            = true
-    string_attribute_constraints {
-      min_length = "1"
-      max_length = "100"
-    }
-  }
-
-  tags = { Project = var.project }
-}
-
-resource "aws_cognito_user_pool_client" "customers" {
-  name         = "smartqueue-customer-client"
-  user_pool_id = aws_cognito_user_pool.customers.id
-  explicit_auth_flows = [
-    "ALLOW_USER_PASSWORD_AUTH",
-    "ALLOW_REFRESH_TOKEN_AUTH",
-    "ALLOW_USER_SRP_AUTH"
-  ]
-  prevent_user_existence_errors = "ENABLED"
-}
-
-resource "aws_cognito_user_pool" "restaurants" {
-  name = var.cognito_restaurant_pool_name
-  auto_verified_attributes = ["email"]
-  username_attributes      = ["email"]
-
-  password_policy {
-    minimum_length    = 8
-    require_numbers   = true
-    require_symbols   = false
-    require_uppercase = false
-    require_lowercase = false
-  }
-
-  schema {
-    name                = "name"
-    attribute_data_type = "String"
-    mutable             = true
-    required            = true
-    string_attribute_constraints {
-      min_length = "1"
-      max_length = "100"
-    }
-  }
-
-  tags = { Project = var.project }
-}
-
-resource "aws_cognito_user_pool_client" "restaurants" {
-  name         = "smartqueue-restaurant-client"
-  user_pool_id = aws_cognito_user_pool.restaurants.id
-  explicit_auth_flows = [
-    "ALLOW_USER_PASSWORD_AUTH",
-    "ALLOW_REFRESH_TOKEN_AUTH",
-    "ALLOW_USER_SRP_AUTH"
-  ]
-  prevent_user_existence_errors = "ENABLED"
-}
-
-# ─── DynamoDB ─────────────────────────────────────────────────────────────────
-
-resource "aws_dynamodb_table" "orders" {
-  name         = var.dynamodb_table_name
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "id"
-  attribute {
-    name = "id"
-    type = "S"
-  }
-  tags = { Project = var.project }
-}
-
-resource "aws_dynamodb_table" "restaurants" {
-  name         = var.restaurants_table_name
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "restaurantId"
-  attribute {
-    name = "restaurantId"
-    type = "S"
-  }
-  tags = { Project = var.project }
-}
-
-resource "aws_dynamodb_table" "customers" {
-  name         = var.customers_table_name
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "email"
-  attribute {
-    name = "email"
-    type = "S"
-  }
-  tags = { Project = var.project }
-}
-
-resource "aws_dynamodb_table" "users" {
-  name         = var.users_table_name
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "email"
-  attribute {
-    name = "email"
-    type = "S"
-  }
-  tags = { Project = var.project }
-}
+data "aws_availability_zones" "available" { state = "available" }
 
 # ─── IAM ──────────────────────────────────────────────────────────────────────
 
@@ -160,108 +41,78 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_iam_role_policy" "dynamodb_access" {
-  name = "${var.project}-dynamodb-policy"
-  role = aws_iam_role.lambda_exec.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Action = [
-        "dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:UpdateItem",
-        "dynamodb:DeleteItem", "dynamodb:Scan", "dynamodb:Query"
-      ]
-      Resource = [
-        aws_dynamodb_table.orders.arn,
-        aws_dynamodb_table.restaurants.arn,
-        aws_dynamodb_table.users.arn,
-        aws_dynamodb_table.customers.arn
-      ]
-    }]
-  })
-}
-
 # ─── Locals ───────────────────────────────────────────────────────────────────
 
 locals {
-  account_id      = data.aws_caller_identity.current.account_id
-  api_arn_prefix  = "arn:aws:execute-api:${var.aws_region}:${local.account_id}:${aws_apigatewayv2_api.main.id}/*/*"
-  orders_env = {
-    TABLE_NAME = aws_dynamodb_table.orders.name
-    JWT_SECRET = var.jwt_secret
-  }
-  auth_env = {
-    USERS_TABLE       = aws_dynamodb_table.users.name
-    RESTAURANTS_TABLE = aws_dynamodb_table.restaurants.name
-    JWT_SECRET        = var.jwt_secret
-  }
-  customer_auth_env = {
-    CUSTOMERS_TABLE = aws_dynamodb_table.customers.name
-  }
-  restaurants_env = {
-    RESTAURANTS_TABLE = aws_dynamodb_table.restaurants.name
-    JWT_SECRET        = var.jwt_secret
-    MASTER_KEY        = var.master_key
-  }
-}
+  account_id     = data.aws_caller_identity.current.account_id
+  api_arn_prefix = "arn:aws:execute-api:${var.aws_region}:${local.account_id}:${aws_apigatewayv2_api.main.id}/*/*"
 
-data "archive_file" "customer_register_zip" {
-  type        = "zip"
-  source_file = "${path.module}/lambda/customerRegister/index.mjs"
-  output_path = "${path.module}/.build/customerRegister.zip"
-}
-data "archive_file" "customer_login_zip" {
-  type        = "zip"
-  source_file = "${path.module}/lambda/customerLogin/index.mjs"
-  output_path = "${path.module}/.build/customerLogin.zip"
+  rds_env = {
+    DB_HOST     = var.db_host
+    DB_PORT     = "3306"
+    DB_NAME     = var.db_name
+    DB_USER     = var.db_username
+    DB_PASSWORD = var.db_password
+    JWT_SECRET  = var.jwt_secret
+    MASTER_KEY  = var.master_key
+  }
 }
 
 # ─── Lambda zips ──────────────────────────────────────────────────────────────
 
 data "archive_file" "place_order_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda/placeOrder/index.mjs"
+  source_dir  = "${path.module}/lambda/placeOrder"
   output_path = "${path.module}/.build/placeOrder.zip"
+  excludes    = ["package-lock.json"]
 }
 data "archive_file" "get_orders_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda/getOrders/index.mjs"
+  source_dir  = "${path.module}/lambda/getOrders"
   output_path = "${path.module}/.build/getOrders.zip"
+  excludes    = ["package-lock.json"]
 }
 data "archive_file" "update_order_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda/updateOrder/index.mjs"
+  source_dir  = "${path.module}/lambda/updateOrder"
   output_path = "${path.module}/.build/updateOrder.zip"
+  excludes    = ["package-lock.json"]
 }
 data "archive_file" "register_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda/register/index.mjs"
+  source_dir  = "${path.module}/lambda/register"
   output_path = "${path.module}/.build/register.zip"
+  excludes    = ["package-lock.json"]
 }
 data "archive_file" "login_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda/login/index.mjs"
+  source_dir  = "${path.module}/lambda/login"
   output_path = "${path.module}/.build/login.zip"
+  excludes    = ["package-lock.json"]
 }
 data "archive_file" "delete_restaurant_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda/deleteRestaurant/index.mjs"
+  source_dir  = "${path.module}/lambda/deleteRestaurant"
   output_path = "${path.module}/.build/deleteRestaurant.zip"
+  excludes    = ["package-lock.json"]
 }
 data "archive_file" "get_restaurant_by_id_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda/getRestaurantById/index.mjs"
+  source_dir  = "${path.module}/lambda/getRestaurantById"
   output_path = "${path.module}/.build/getRestaurantById.zip"
+  excludes    = ["package-lock.json"]
 }
 data "archive_file" "get_restaurants_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda/getRestaurants/index.mjs"
+  source_dir  = "${path.module}/lambda/getRestaurants"
   output_path = "${path.module}/.build/getRestaurants.zip"
+  excludes    = ["package-lock.json"]
 }
 data "archive_file" "update_restaurant_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda/updateRestaurant/index.mjs"
+  source_dir  = "${path.module}/lambda/updateRestaurant"
   output_path = "${path.module}/.build/updateRestaurant.zip"
+  excludes    = ["package-lock.json"]
 }
 
 # ─── Lambda functions ─────────────────────────────────────────────────────────
@@ -273,7 +124,8 @@ resource "aws_lambda_function" "place_order" {
   handler          = "index.handler"
   filename         = data.archive_file.place_order_zip.output_path
   source_code_hash = data.archive_file.place_order_zip.output_base64sha256
-  environment { variables = local.orders_env }
+  timeout          = 15
+  environment { variables = local.rds_env }
   tags = { Project = var.project }
 }
 
@@ -284,7 +136,8 @@ resource "aws_lambda_function" "get_orders" {
   handler          = "index.handler"
   filename         = data.archive_file.get_orders_zip.output_path
   source_code_hash = data.archive_file.get_orders_zip.output_base64sha256
-  environment { variables = local.orders_env }
+  timeout          = 15
+  environment { variables = local.rds_env }
   tags = { Project = var.project }
 }
 
@@ -295,7 +148,8 @@ resource "aws_lambda_function" "update_order" {
   handler          = "index.handler"
   filename         = data.archive_file.update_order_zip.output_path
   source_code_hash = data.archive_file.update_order_zip.output_base64sha256
-  environment { variables = local.orders_env }
+  timeout          = 15
+  environment { variables = local.rds_env }
   tags = { Project = var.project }
 }
 
@@ -306,7 +160,8 @@ resource "aws_lambda_function" "register" {
   handler          = "index.handler"
   filename         = data.archive_file.register_zip.output_path
   source_code_hash = data.archive_file.register_zip.output_base64sha256
-  environment { variables = local.auth_env }
+  timeout          = 15
+  environment { variables = local.rds_env }
   tags = { Project = var.project }
 }
 
@@ -317,7 +172,8 @@ resource "aws_lambda_function" "login" {
   handler          = "index.handler"
   filename         = data.archive_file.login_zip.output_path
   source_code_hash = data.archive_file.login_zip.output_base64sha256
-  environment { variables = local.auth_env }
+  timeout          = 15
+  environment { variables = local.rds_env }
   tags = { Project = var.project }
 }
 
@@ -328,34 +184,9 @@ resource "aws_lambda_function" "delete_restaurant" {
   handler          = "index.handler"
   filename         = data.archive_file.delete_restaurant_zip.output_path
   source_code_hash = data.archive_file.delete_restaurant_zip.output_base64sha256
-  environment { variables = local.restaurants_env }
+  timeout          = 15
+  environment { variables = local.rds_env }
   tags = { Project = var.project }
-}
-
-resource "aws_cloudwatch_log_group" "delete_restaurant" {
-  name              = "/aws/lambda/${aws_lambda_function.delete_restaurant.function_name}"
-  retention_in_days = 7
-}
-
-resource "aws_apigatewayv2_integration" "delete_restaurant" {
-  api_id                 = aws_apigatewayv2_api.main.id
-  integration_type       = "AWS_PROXY"
-  integration_uri        = aws_lambda_function.delete_restaurant.invoke_arn
-  payload_format_version = "2.0"
-}
-
-resource "aws_apigatewayv2_route" "delete_restaurant" {
-  api_id    = aws_apigatewayv2_api.main.id
-  route_key = "DELETE /restaurants/{id}"
-  target    = "integrations/${aws_apigatewayv2_integration.delete_restaurant.id}"
-}
-
-resource "aws_lambda_permission" "delete_restaurant" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.delete_restaurant.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${local.api_arn_prefix}/restaurants/*"
 }
 
 resource "aws_lambda_function" "get_restaurant_by_id" {
@@ -365,7 +196,8 @@ resource "aws_lambda_function" "get_restaurant_by_id" {
   handler          = "index.handler"
   filename         = data.archive_file.get_restaurant_by_id_zip.output_path
   source_code_hash = data.archive_file.get_restaurant_by_id_zip.output_base64sha256
-  environment { variables = local.restaurants_env }
+  timeout          = 15
+  environment { variables = local.rds_env }
   tags = { Project = var.project }
 }
 
@@ -376,7 +208,8 @@ resource "aws_lambda_function" "get_restaurants" {
   handler          = "index.handler"
   filename         = data.archive_file.get_restaurants_zip.output_path
   source_code_hash = data.archive_file.get_restaurants_zip.output_base64sha256
-  environment { variables = local.restaurants_env }
+  timeout          = 15
+  environment { variables = local.rds_env }
   tags = { Project = var.project }
 }
 
@@ -387,7 +220,8 @@ resource "aws_lambda_function" "update_restaurant" {
   handler          = "index.handler"
   filename         = data.archive_file.update_restaurant_zip.output_path
   source_code_hash = data.archive_file.update_restaurant_zip.output_base64sha256
-  environment { variables = local.restaurants_env }
+  timeout          = 15
+  environment { variables = local.rds_env }
   tags = { Project = var.project }
 }
 
@@ -415,6 +249,10 @@ resource "aws_cloudwatch_log_group" "register" {
 }
 resource "aws_cloudwatch_log_group" "login_fn" {
   name              = "/aws/lambda/${aws_lambda_function.login.function_name}"
+  retention_in_days = 7
+}
+resource "aws_cloudwatch_log_group" "delete_restaurant" {
+  name              = "/aws/lambda/${aws_lambda_function.delete_restaurant.function_name}"
   retention_in_days = 7
 }
 resource "aws_cloudwatch_log_group" "get_restaurant_by_id" {
@@ -491,6 +329,12 @@ resource "aws_apigatewayv2_integration" "login" {
   integration_uri        = aws_lambda_function.login.invoke_arn
   payload_format_version = "2.0"
 }
+resource "aws_apigatewayv2_integration" "delete_restaurant" {
+  api_id                 = aws_apigatewayv2_api.main.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.delete_restaurant.invoke_arn
+  payload_format_version = "2.0"
+}
 resource "aws_apigatewayv2_integration" "get_restaurant_by_id" {
   api_id                 = aws_apigatewayv2_api.main.id
   integration_type       = "AWS_PROXY"
@@ -552,6 +396,11 @@ resource "aws_apigatewayv2_route" "update_restaurant" {
   route_key = "PATCH /restaurants/{id}"
   target    = "integrations/${aws_apigatewayv2_integration.update_restaurant.id}"
 }
+resource "aws_apigatewayv2_route" "delete_restaurant" {
+  api_id    = aws_apigatewayv2_api.main.id
+  route_key = "DELETE /restaurants/{id}"
+  target    = "integrations/${aws_apigatewayv2_integration.delete_restaurant.id}"
+}
 
 # ─── Lambda permissions ───────────────────────────────────────────────────────
 
@@ -590,6 +439,13 @@ resource "aws_lambda_permission" "login" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${local.api_arn_prefix}/login"
 }
+resource "aws_lambda_permission" "delete_restaurant" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.delete_restaurant.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${local.api_arn_prefix}/restaurants/*"
+}
 resource "aws_lambda_permission" "get_restaurant_by_id" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
@@ -612,74 +468,37 @@ resource "aws_lambda_permission" "update_restaurant" {
   source_arn    = "${local.api_arn_prefix}/restaurants/*"
 }
 
-# ─── Customer Auth Lambdas ────────────────────────────────────────────────────
+# ─── DB Init Lambda (creates tables on first deploy) ─────────────────────────
 
-resource "aws_lambda_function" "customer_register" {
-  function_name    = "${var.project}-customerRegister"
+data "archive_file" "db_init_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda/dbInit"
+  output_path = "${path.module}/.build/dbInit.zip"
+  excludes    = ["package-lock.json"]
+}
+
+resource "aws_lambda_function" "db_init" {
+  function_name    = "${var.project}-dbInit"
   role             = aws_iam_role.lambda_exec.arn
   runtime          = var.lambda_runtime
   handler          = "index.handler"
-  filename         = data.archive_file.customer_register_zip.output_path
-  source_code_hash = data.archive_file.customer_register_zip.output_base64sha256
-  environment { variables = local.customer_auth_env }
+  filename         = data.archive_file.db_init_zip.output_path
+  source_code_hash = data.archive_file.db_init_zip.output_base64sha256
+  timeout          = 30
+  environment { variables = local.rds_env }
   tags = { Project = var.project }
 }
 
-resource "aws_lambda_function" "customer_login" {
-  function_name    = "${var.project}-customerLogin"
-  role             = aws_iam_role.lambda_exec.arn
-  runtime          = var.lambda_runtime
-  handler          = "index.handler"
-  filename         = data.archive_file.customer_login_zip.output_path
-  source_code_hash = data.archive_file.customer_login_zip.output_base64sha256
-  environment { variables = local.customer_auth_env }
-  tags = { Project = var.project }
-}
-
-resource "aws_cloudwatch_log_group" "customer_register" {
-  name              = "/aws/lambda/${aws_lambda_function.customer_register.function_name}"
-  retention_in_days = 7
-}
-resource "aws_cloudwatch_log_group" "customer_login" {
-  name              = "/aws/lambda/${aws_lambda_function.customer_login.function_name}"
+resource "aws_cloudwatch_log_group" "db_init" {
+  name              = "/aws/lambda/${aws_lambda_function.db_init.function_name}"
   retention_in_days = 7
 }
 
-resource "aws_apigatewayv2_integration" "customer_register" {
-  api_id                 = aws_apigatewayv2_api.main.id
-  integration_type       = "AWS_PROXY"
-  integration_uri        = aws_lambda_function.customer_register.invoke_arn
-  payload_format_version = "2.0"
-}
-resource "aws_apigatewayv2_integration" "customer_login" {
-  api_id                 = aws_apigatewayv2_api.main.id
-  integration_type       = "AWS_PROXY"
-  integration_uri        = aws_lambda_function.customer_login.invoke_arn
-  payload_format_version = "2.0"
-}
-
-resource "aws_apigatewayv2_route" "customer_register" {
-  api_id    = aws_apigatewayv2_api.main.id
-  route_key = "POST /customerRegister"
-  target    = "integrations/${aws_apigatewayv2_integration.customer_register.id}"
-}
-resource "aws_apigatewayv2_route" "customer_login" {
-  api_id    = aws_apigatewayv2_api.main.id
-  route_key = "POST /customerLogin"
-  target    = "integrations/${aws_apigatewayv2_integration.customer_login.id}"
-}
-
-resource "aws_lambda_permission" "customer_register" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.customer_register.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${local.api_arn_prefix}/customerRegister"
-}
-resource "aws_lambda_permission" "customer_login" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.customer_login.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${local.api_arn_prefix}/customerLogin"
+# Invoke dbInit once after deploy to create tables
+resource "null_resource" "run_db_init" {
+  triggers = { always = timestamp() }
+  provisioner "local-exec" {
+    command = "aws lambda invoke --function-name ${aws_lambda_function.db_init.function_name} --region ${var.aws_region} --output json NUL 2>&1 || aws lambda invoke --function-name ${aws_lambda_function.db_init.function_name} --region ${var.aws_region} --output json /tmp/dbinit_out.json"
+  }
+  depends_on = [aws_lambda_function.db_init]
 }

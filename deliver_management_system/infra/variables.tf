@@ -1,56 +1,56 @@
 variable "aws_region" {
-  type    = string
-  default = "ap-southeast-1"
+  description = "AWS region to deploy resources"
+  type        = string
+  default     = "ap-southeast-1"
 }
 
 variable "project" {
-  type    = string
-  default = "smartqueue"
-}
-
-variable "dynamodb_table_name" {
-  type    = string
-  default = "Orders"
-}
-
-variable "restaurants_table_name" {
-  type    = string
-  default = "Restaurants"
-}
-
-variable "customers_table_name" {
-  type    = string
-  default = "Customers"
-}
-
-variable "users_table_name" {
-  type    = string
-  default = "Users"
-}
-
-variable "cognito_customer_pool_name" {
-  type    = string
-  default = "smartqueue-customers"
-}
-
-variable "cognito_restaurant_pool_name" {
-  type    = string
-  default = "smartqueue-restaurants"
+  description = "Project name prefix for all resources"
+  type        = string
+  default     = "smartqueue"
 }
 
 variable "lambda_runtime" {
-  type    = string
-  default = "nodejs20.x"
+  description = "Lambda runtime"
+  type        = string
+  default     = "nodejs20.x"
 }
 
 variable "jwt_secret" {
-  type      = string
-  default   = "smartqueue-secret"
-  sensitive = true
+  description = "Secret key for signing JWT tokens"
+  type        = string
+  default     = "smartqueue-jwt-secret-change-in-prod"
+  sensitive   = true
 }
 
 variable "master_key" {
-  type      = string
-  default   = "MASTER-SMARTQUEUE-2024"
-  sensitive = true
+  description = "Master admin key for managing all restaurants"
+  type        = string
+  default     = "MASTER-SMARTQUEUE-2024"
+  sensitive   = true
+}
+
+variable "db_name" {
+  description = "RDS database name"
+  type        = string
+  default     = "smartqueue"
+}
+
+variable "db_username" {
+  description = "RDS master username"
+  type        = string
+  default     = "admin"
+  sensitive   = true
+}
+
+variable "db_password" {
+  description = "RDS master password"
+  type        = string
+  sensitive   = true
+}
+
+variable "db_host" {
+  description = "RDS endpoint hostname"
+  type        = string
+  default     = "smartqueue-mysql.cliwcewwcbhv.ap-southeast-1.rds.amazonaws.com"
 }

@@ -1,78 +1,80 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, UpdateCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
+import mysql from "mysql2/promise";
 import { createHmac } from "crypto";
-
-const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
-const TABLE = process.env.RESTAURANTS_TABLE;
-const SECRET = process.env.JWT_SECRET;
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type,Authorization",
+  "Access-Control-Allow-Headers": "Content-Type,Authorization,x-master-key",
   "Content-Type": "application/json",
 };
 
-const verifyToken = (authHeader) => {
-  if (!authHeader?.startsWith("Bearer ")) return null;
+const SECRET     = process.env.JWT_SECRET ?? "smartqueue-secret";
+const MASTER_KEY = process.env.MASTER_KEY ?? "MASTER-SMARTQUEUE-2024";
+
+const getConn = () => mysql.createConnection({
+  host: process.env.DB_HOST, port: Number(process.env.DB_PORT) || 3306,
+  user: process.env.DB_USER, password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
+
+const verifyJwt = (token) => {
   try {
-    const token = authHeader.slice(7);
-    const parts = token.split(".");
-    if (parts.length !== 3) return null;
-    const [header, body, sig] = parts;
-    // Verify HMAC signature
-    const expected = createHmac("sha256", SECRET).update(`${header}.${body}`).digest("base64url");
-    if (sig !== expected) return null;
-    const payload = JSON.parse(Buffer.from(body, "base64url").toString());
-    return { restaurantId: payload.restaurantId };
+    const [h, b, s] = token.split(".");
+    const expected = createHmac("sha256", SECRET).update(`${h}.${b}`).digest("base64url");
+    if (s !== expected) return null;
+    return JSON.parse(Buffer.from(b, "base64url").toString());
   } catch { return null; }
 };
 
 export const handler = async (event) => {
+  const conn = await getConn();
   try {
-    const claims = verifyToken(event.headers?.authorization ?? event.headers?.Authorization);
-    if (!claims) return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "Unauthorized" }) };
+    const id = event.pathParameters?.id;
+    if (!id) return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "id required" }) };
 
-    const restaurantId = event.pathParameters?.id;
-    if (claims.restaurantId !== restaurantId)
-      return { statusCode: 403, headers: cors, body: JSON.stringify({ error: "Forbidden — you can only update your own restaurant" }) };
+    const masterKey = event.headers?.["x-master-key"] ?? event.headers?.["X-Master-Key"];
+    const authHeader = event.headers?.authorization ?? event.headers?.Authorization;
 
-    const { name, location, menu, image, cuisine, rating, deliveryTime, deliveryFee, offer, isVeg } = JSON.parse(event.body ?? "{}");
+    let authorized = false;
+    if (masterKey === MASTER_KEY) {
+      authorized = true;
+    } else if (authHeader?.startsWith("Bearer ")) {
+      const claims = verifyJwt(authHeader.slice(7));
+      if (claims?.restaurantId === id) authorized = true;
+    }
 
-    const updates = [];
-    const names = {};
-    const values = {};
+    if (!authorized)
+      return { statusCode: 403, headers: cors, body: JSON.stringify({ error: "Not authorized" }) };
 
-    if (name)                    { updates.push("#n = :n");    names["#n"] = "name";         values[":n"] = name; }
-    if (location)                { updates.push("#l = :l");    names["#l"] = "location";     values[":l"] = location; }
-    if (menu !== undefined)      { updates.push("menu = :m");                                 values[":m"] = menu; }
-    if (image !== undefined)     { updates.push("#img = :img"); names["#img"] = "image";      values[":img"] = image; }
-    if (cuisine !== undefined)   { updates.push("cuisine = :c");                              values[":c"] = cuisine; }
-    if (rating !== undefined)    { updates.push("rating = :rt");                              values[":rt"] = rating; }
-    if (deliveryTime !== undefined) { updates.push("deliveryTime = :dt");                     values[":dt"] = deliveryTime; }
-    if (deliveryFee !== undefined)  { updates.push("deliveryFee = :df");                      values[":df"] = deliveryFee; }
-    if (offer !== undefined)     { updates.push("#of = :of");  names["#of"] = "offer";       values[":of"] = offer; }
-    if (isVeg !== undefined)     { updates.push("isVeg = :iv");                               values[":iv"] = isVeg; }
+    const body = JSON.parse(event.body ?? "{}");
+    const { menu, name, location, image, cuisine, deliveryTime, deliveryFee, isVeg, offer, rating } = body;
 
-    if (!updates.length)
-      return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "Nothing to update" }) };
+    const fields = [];
+    const values = [];
 
-    await client.send(new UpdateCommand({
-      TableName: TABLE,
-      Key: { restaurantId },
-      UpdateExpression: `SET ${updates.join(", ")}`,
-      ExpressionAttributeNames: Object.keys(names).length ? names : undefined,
-      ExpressionAttributeValues: values,
-      ConditionExpression: "attribute_exists(restaurantId)",
-    }));
+    if (menu !== undefined)        { fields.push("menu = ?");         values.push(JSON.stringify(menu)); }
+    if (name !== undefined)        { fields.push("name = ?");         values.push(name); }
+    if (location !== undefined)    { fields.push("location = ?");     values.push(location); }
+    if (image !== undefined)       { fields.push("image = ?");        values.push(image); }
+    if (cuisine !== undefined)     { fields.push("cuisine = ?");      values.push(cuisine); }
+    if (deliveryTime !== undefined){ fields.push("deliveryTime = ?"); values.push(deliveryTime); }
+    if (deliveryFee !== undefined) { fields.push("deliveryFee = ?");  values.push(deliveryFee); }
+    if (isVeg !== undefined)       { fields.push("isVeg = ?");        values.push(isVeg ? 1 : 0); }
+    if (offer !== undefined)       { fields.push("offer = ?");        values.push(offer); }
+    if (rating !== undefined)      { fields.push("rating = ?");       values.push(rating); }
 
-    const { Item } = await client.send(new GetCommand({ TableName: TABLE, Key: { restaurantId } }));
-    const { password: _, ...safe } = Item;
+    if (!fields.length)
+      return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "No fields to update" }) };
 
-    return { statusCode: 200, headers: cors, body: JSON.stringify({ data: safe }) };
+    values.push(id);
+    await conn.execute(`UPDATE restaurants SET ${fields.join(", ")} WHERE restaurantId = ?`, values);
+
+    const [rows] = await conn.execute("SELECT * FROM restaurants WHERE restaurantId = ?", [id]);
+    const r = rows[0];
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ data: { ...r, menu: r.menu ? JSON.parse(r.menu) : [] } }) };
   } catch (err) {
-    if (err.name === "ConditionalCheckFailedException")
-      return { statusCode: 404, headers: cors, body: JSON.stringify({ error: "Restaurant not found" }) };
     console.error(err);
     return { statusCode: 500, headers: cors, body: JSON.stringify({ error: err.message }) };
+  } finally {
+    await conn.end();
   }
 };
