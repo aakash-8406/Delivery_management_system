@@ -1,1 +1,0 @@
-{"statusCode":500,"headers":{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"Content-Type,Authorization","Content-Type":"application/json"},"body":"{\"error\":\"1 validation error detected: Value null at 'tableName' failed to satisfy constraint: Member must not be null\"}"}

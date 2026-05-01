@@ -30,3 +30,11 @@ infra/*.tfvars
 Thumbs.db
 .vscode/
 .idea/
+
+# Terraform build artifacts
+infra/.build/
+infra/terraform.tfstate*
+infra/.terraform/
+infra/.terraform.lock.hcl
+infra/res.json
+infra/response.json
