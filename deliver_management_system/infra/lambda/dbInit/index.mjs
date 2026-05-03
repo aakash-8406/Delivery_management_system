@@ -22,7 +22,7 @@ export const handler = async () => {
         email        VARCHAR(255) NOT NULL,
         password     VARCHAR(255) NOT NULL,
         menu         LONGTEXT     NULL,
-        image        VARCHAR(500) DEFAULT NULL,
+        image        LONGTEXT     DEFAULT NULL,
         cuisine      VARCHAR(255) DEFAULT NULL,
         rating       DECIMAL(3,1) DEFAULT NULL,
         deliveryTime VARCHAR(50)  DEFAULT NULL,
@@ -32,6 +32,11 @@ export const handler = async () => {
         createdAt    VARCHAR(50)  NOT NULL
       )
     `);
+
+    // Migrate existing image column from VARCHAR(500) to LONGTEXT if needed
+    await conn.execute(`
+      ALTER TABLE restaurants MODIFY COLUMN image LONGTEXT DEFAULT NULL
+    `).catch(() => {});
 
     await conn.execute(`
       CREATE TABLE IF NOT EXISTS customers (

@@ -22,13 +22,18 @@ const CATEGORY_IMAGES = {
 
 const empty = () => ({ name: '', description: '', price: '', category: 'Other', isVeg: false, isPopular: false, imageUrl: '' });
 
-// Convert file to base64 data URL
-const fileToDataUrl = (file) => new Promise((res, rej) => {
-  const reader = new FileReader();
-  reader.onload = () => res(reader.result);
-  reader.onerror = rej;
-  reader.readAsDataURL(file);
-});
+// Upload file to S3 via presigned URL, return public URL
+const uploadToS3 = async (file) => {
+  const BASE = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
+  const res = await fetch(`${BASE}/getUploadUrl`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fileType: file.type, folder: 'restaurants' }),
+  });
+  const { uploadUrl, publicUrl } = await res.json();
+  await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
+  return publicUrl;
+};
 
 export default function MenuPage() {
   const { user, setSession } = useAuth();
@@ -87,9 +92,11 @@ export default function MenuPage() {
   const handleItemImageFile = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const dataUrl = await fileToDataUrl(file);
-    setForm(f => ({ ...f, imageUrl: dataUrl }));
-    setImagePreview(dataUrl);
+    try {
+      const url = await uploadToS3(file);
+      setForm(f => ({ ...f, imageUrl: url }));
+      setImagePreview(url);
+    } catch { toast.error('Image upload failed'); }
   };
 
   const openAdd = () => {
@@ -158,9 +165,11 @@ export default function MenuPage() {
   const handleCoverFile = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const dataUrl = await fileToDataUrl(file);
-    setCoverPreview(dataUrl);
-    await saveCover(dataUrl);
+    try {
+      const url = await uploadToS3(file);
+      setCoverPreview(url);
+      await saveCover(url);
+    } catch { toast.error('Image upload failed'); }
   };
 
   const saveCover = async (imageUrl) => {
