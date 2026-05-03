@@ -1,52 +1,43 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
-import { createHash } from "crypto";
-
-const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
-const TABLE  = process.env.CUSTOMERS_TABLE;
+import mysql from "mysql2/promise";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type,Authorization",
+  "Access-Control-Allow-Headers": "Content-Type,Authorization,x-master-key",
   "Content-Type": "application/json",
 };
 
-const hash = (pw) => createHash("sha256").update(pw).digest("hex");
+const getConn = () => mysql.createConnection({
+  host: process.env.DB_HOST, port: Number(process.env.DB_PORT) || 3306,
+  user: process.env.DB_USER, password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
 
 export const handler = async (event) => {
+  const conn = await getConn();
   try {
     const { email: rawEmail, password } = JSON.parse(event.body ?? "{}");
-
-    if (!rawEmail || !password)
+    const email = rawEmail?.toLowerCase().trim();
+    if (!email || !password)
       return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "email and password required" }) };
 
-    const emailLower = rawEmail.toLowerCase().trim();
-    const emailOrig  = rawEmail.trim();
+    const [rows] = await conn.execute("SELECT * FROM customers WHERE email = ?", [email]);
+    if (!rows.length)
+      return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "No account found with this email" }) };
 
-    // Try lowercase first, then original case (for accounts registered before normalization)
-    let Item;
-    const res1 = await client.send(new GetCommand({ TableName: TABLE, Key: { email: emailLower } }));
-    Item = res1.Item;
+    const customer = rows[0];
+    if (customer.password !== password)
+      return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "Incorrect password" }) };
 
-    if (!Item && emailOrig !== emailLower) {
-      const res2 = await client.send(new GetCommand({ TableName: TABLE, Key: { email: emailOrig } }));
-      Item = res2.Item;
-    }
+    const token = "cq_" + Buffer.from(email).toString("base64");
 
-    if (!Item)
-      return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "No account found with this email. Please register first." }) };
-
-    if (Item.passwordHash !== hash(password))
-      return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "Incorrect password." }) };
-
-    const { passwordHash: _, ...safe } = Item;
     return {
-      statusCode: 200,
-      headers: cors,
-      body: JSON.stringify({ data: { user: safe, token: "cq_" + Buffer.from(Item.email).toString("base64") } }),
+      statusCode: 200, headers: cors,
+      body: JSON.stringify({ data: { token, user: { customerId: customer.customerId, name: customer.name, email: customer.email } } })
     };
   } catch (err) {
     console.error(err);
     return { statusCode: 500, headers: cors, body: JSON.stringify({ error: err.message }) };
+  } finally {
+    await conn.end();
   }
 };

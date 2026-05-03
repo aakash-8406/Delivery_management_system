@@ -115,7 +115,45 @@ data "archive_file" "update_restaurant_zip" {
   excludes    = ["package-lock.json"]
 }
 
+data "archive_file" "customer_register_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda/customerRegister"
+  output_path = "${path.module}/.build/customerRegister.zip"
+  excludes    = ["package-lock.json"]
+}
+
+data "archive_file" "customer_login_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda/customerLogin"
+  output_path = "${path.module}/.build/customerLogin.zip"
+  excludes    = ["package-lock.json"]
+}
+
 # ─── Lambda functions ─────────────────────────────────────────────────────────
+
+resource "aws_lambda_function" "customer_register" {
+  function_name    = "${var.project}-customerRegister"
+  role             = aws_iam_role.lambda_exec.arn
+  runtime          = var.lambda_runtime
+  handler          = "index.handler"
+  filename         = data.archive_file.customer_register_zip.output_path
+  source_code_hash = data.archive_file.customer_register_zip.output_base64sha256
+  timeout          = 15
+  environment { variables = local.rds_env }
+  tags = { Project = var.project }
+}
+
+resource "aws_lambda_function" "customer_login" {
+  function_name    = "${var.project}-customerLogin"
+  role             = aws_iam_role.lambda_exec.arn
+  runtime          = var.lambda_runtime
+  handler          = "index.handler"
+  filename         = data.archive_file.customer_login_zip.output_path
+  source_code_hash = data.archive_file.customer_login_zip.output_base64sha256
+  timeout          = 15
+  environment { variables = local.rds_env }
+  tags = { Project = var.project }
+}
 
 resource "aws_lambda_function" "place_order" {
   function_name    = "${var.project}-placeOrder"
@@ -227,6 +265,14 @@ resource "aws_lambda_function" "update_restaurant" {
 
 # ─── CloudWatch ───────────────────────────────────────────────────────────────
 
+resource "aws_cloudwatch_log_group" "customer_register" {
+  name              = "/aws/lambda/${aws_lambda_function.customer_register.function_name}"
+  retention_in_days = 7
+}
+resource "aws_cloudwatch_log_group" "customer_login" {
+  name              = "/aws/lambda/${aws_lambda_function.customer_login.function_name}"
+  retention_in_days = 7
+}
 resource "aws_cloudwatch_log_group" "api_gw" {
   name              = "/aws/apigateway/${var.project}-api"
   retention_in_days = 7
@@ -299,6 +345,18 @@ resource "aws_apigatewayv2_stage" "default" {
 
 # ─── Integrations ─────────────────────────────────────────────────────────────
 
+resource "aws_apigatewayv2_integration" "customer_register" {
+  api_id                 = aws_apigatewayv2_api.main.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.customer_register.invoke_arn
+  payload_format_version = "2.0"
+}
+resource "aws_apigatewayv2_integration" "customer_login" {
+  api_id                 = aws_apigatewayv2_api.main.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.customer_login.invoke_arn
+  payload_format_version = "2.0"
+}
 resource "aws_apigatewayv2_integration" "place_order" {
   api_id                 = aws_apigatewayv2_api.main.id
   integration_type       = "AWS_PROXY"
@@ -356,6 +414,16 @@ resource "aws_apigatewayv2_integration" "update_restaurant" {
 
 # ─── Routes ───────────────────────────────────────────────────────────────────
 
+resource "aws_apigatewayv2_route" "customer_register" {
+  api_id    = aws_apigatewayv2_api.main.id
+  route_key = "POST /customerRegister"
+  target    = "integrations/${aws_apigatewayv2_integration.customer_register.id}"
+}
+resource "aws_apigatewayv2_route" "customer_login" {
+  api_id    = aws_apigatewayv2_api.main.id
+  route_key = "POST /customerLogin"
+  target    = "integrations/${aws_apigatewayv2_integration.customer_login.id}"
+}
 resource "aws_apigatewayv2_route" "place_order" {
   api_id    = aws_apigatewayv2_api.main.id
   route_key = "POST /placeOrder"
@@ -404,6 +472,20 @@ resource "aws_apigatewayv2_route" "delete_restaurant" {
 
 # ─── Lambda permissions ───────────────────────────────────────────────────────
 
+resource "aws_lambda_permission" "customer_register" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.customer_register.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${local.api_arn_prefix}/customerRegister"
+}
+resource "aws_lambda_permission" "customer_login" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.customer_login.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${local.api_arn_prefix}/customerLogin"
+}
 resource "aws_lambda_permission" "place_order" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"

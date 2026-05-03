@@ -1,0 +1,1 @@
+{"name":"customerRegister","type":"module","dependencies":{"mysql2":"^3.6.0"}}

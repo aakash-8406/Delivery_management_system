@@ -1,45 +1,49 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
-import { createHash } from "crypto";
-
-const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
-const TABLE  = process.env.CUSTOMERS_TABLE;
+import mysql from "mysql2/promise";
+import { randomUUID } from "crypto";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type,Authorization",
+  "Access-Control-Allow-Headers": "Content-Type,Authorization,x-master-key",
   "Content-Type": "application/json",
 };
 
-const hash = (pw) => createHash("sha256").update(pw).digest("hex");
+const getConn = () => mysql.createConnection({
+  host: process.env.DB_HOST, port: Number(process.env.DB_PORT) || 3306,
+  user: process.env.DB_USER, password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
 
 export const handler = async (event) => {
+  const conn = await getConn();
   try {
-    const { name, email: rawEmail, password } = JSON.parse(event.body ?? "{}");
+    const { name, email: rawEmail, password, phone, address } = JSON.parse(event.body ?? "{}");
     const email = rawEmail?.toLowerCase().trim();
-
     if (!name || !email || !password)
       return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "name, email and password required" }) };
 
-    if (password.length < 8 || !/\d/.test(password))
-      return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "Password must be at least 8 characters and contain a number" }) };
-
-    const { Item } = await client.send(new GetCommand({ TableName: TABLE, Key: { email } }));
-    if (Item)
+    const [existing] = await conn.execute("SELECT customerId FROM customers WHERE email = ?", [email]);
+    if (existing.length)
       return { statusCode: 409, headers: cors, body: JSON.stringify({ error: "Email already registered" }) };
 
-    const userId = "u" + Date.now();
-    const customer = { email, name, userId, passwordHash: hash(password), createdAt: new Date().toISOString() };
-    await client.send(new PutCommand({ TableName: TABLE, Item: customer }));
+    const customerId = randomUUID();
+    const createdAt = new Date().toISOString();
+    // Simple base64 token for customer auth
+    const token = "cq_" + Buffer.from(email).toString("base64");
 
-    const { passwordHash: _, ...safe } = customer;
+    await conn.execute(
+      `INSERT INTO customers (customerId, name, email, password, phone, address, createdAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [customerId, name, email, password, phone ?? "", address ?? "", createdAt]
+    );
+
     return {
-      statusCode: 201,
-      headers: cors,
-      body: JSON.stringify({ data: { user: safe, token: "cq_" + Buffer.from(email).toString("base64") } }),
+      statusCode: 201, headers: cors,
+      body: JSON.stringify({ data: { token, user: { customerId, name, email, createdAt } } })
     };
   } catch (err) {
     console.error(err);
     return { statusCode: 500, headers: cors, body: JSON.stringify({ error: err.message }) };
+  } finally {
+    await conn.end();
   }
 };

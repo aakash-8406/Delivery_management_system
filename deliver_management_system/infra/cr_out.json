@@ -1,0 +1,1 @@
+{"statusCode":201,"headers":{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"Content-Type,Authorization,x-master-key","Content-Type":"application/json"},"body":"{\"data\":{\"token\":\"cq_dEB0LmNvbQ==\",\"user\":{\"customerId\":\"2ca64914-0e6b-4396-8c31-768326e7df95\",\"name\":\"Test\",\"email\":\"t@t.com\",\"createdAt\":\"2026-05-03T16:44:50.864Z\"}}}"}

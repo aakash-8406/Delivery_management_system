@@ -34,6 +34,18 @@ export const handler = async () => {
     `);
 
     await conn.execute(`
+      CREATE TABLE IF NOT EXISTS customers (
+        customerId VARCHAR(36)   PRIMARY KEY,
+        name       VARCHAR(255)  NOT NULL,
+        email      VARCHAR(255)  NOT NULL UNIQUE,
+        password   VARCHAR(255)  NOT NULL,
+        phone      VARCHAR(50)   DEFAULT NULL,
+        address    TEXT          NULL,
+        createdAt  VARCHAR(50)   NOT NULL
+      )
+    `);
+
+    await conn.execute(`
       CREATE TABLE IF NOT EXISTS orders (
         id              VARCHAR(36)   PRIMARY KEY,
         userId          VARCHAR(255)  NOT NULL,

@@ -35,7 +35,7 @@ pipeline {
             DB_HOST=smartqueue-mysql.cliwcewwcbhv.ap-southeast-1.rds.amazonaws.com
 
             # Install mysql2 deps and zip+deploy each Lambda
-            for fn in getRestaurants getRestaurantById login register placeOrder getOrders updateOrder deleteRestaurant updateRestaurant; do
+            for fn in getRestaurants getRestaurantById login register placeOrder getOrders updateOrder deleteRestaurant updateRestaurant customerRegister customerLogin; do
               echo "--- Deploying \$fn ---"
               cd \$LAMBDA_DIR/\$fn
               npm install --omit=dev --silent
