@@ -34,7 +34,7 @@ pipeline {
             DB_HOST=smartqueue-mysql.cliwcewwcbhv.ap-southeast-1.rds.amazonaws.com
 
             # Install mysql2 deps and zip+deploy each Lambda
-            for fn in getRestaurants getRestaurantById login register placeOrder getOrders updateOrder deleteRestaurant updateRestaurant customerRegister customerLogin; do
+            for fn in getRestaurants getRestaurantById login register placeOrder getOrders updateOrder deleteRestaurant updateRestaurant customerRegister customerLogin getUploadUrl; do
               echo "--- Deploying \$fn ---"
               cd \$LAMBDA_DIR/\$fn
               npm install --omit=dev --silent
@@ -49,7 +49,7 @@ pipeline {
               # Update env vars with RDS connection
               aws lambda update-function-configuration \\
                 --function-name smartqueue-\$fn \\
-                --environment "Variables={DB_HOST=\$DB_HOST,DB_PORT=3306,DB_NAME=smartqueue,DB_USER=admin,DB_PASSWORD=\${DB_PASSWORD},JWT_SECRET=smartqueue-secret,MASTER_KEY=\${MASTER_KEY}}" \\
+                --environment "Variables={DB_HOST=\$DB_HOST,DB_PORT=3306,DB_NAME=smartqueue,DB_USER=admin,DB_PASSWORD=\${DB_PASSWORD},JWT_SECRET=smartqueue-secret,MASTER_KEY=\${MASTER_KEY},S3_BUCKET=smartqueue-images-948976368048}" \\
                 --region \${AWS_DEFAULT_REGION} > /dev/null
               aws lambda wait function-updated \\
                 --function-name smartqueue-\$fn \\
