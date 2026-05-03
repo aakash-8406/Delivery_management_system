@@ -7,7 +7,6 @@ pipeline {
     RESTAURANT_IMAGE = "${DOCKERHUB_USER}/smartqueue-restaurant"
     IMAGE_TAG        = "${BUILD_NUMBER}"
     K8S_NAMESPACE    = "smartqueue"
-    API_GATEWAY_URL  = "https://3bogj0t874.execute-api.ap-southeast-1.amazonaws.com"
   }
 
   stages {
@@ -70,11 +69,12 @@ pipeline {
         stage('customer-app') {
           steps {
             withCredentials([
-              string(credentialsId: 'MASTER_KEY', variable: 'MKEY')
+              string(credentialsId: 'API_GATEWAY_URL', variable: 'API_URL'),
+              string(credentialsId: 'MASTER_KEY',      variable: 'MKEY')
             ]) {
               sh """
                 docker build \\
-                  --build-arg VITE_API_URL=${API_GATEWAY_URL} \\
+                  --build-arg VITE_API_URL=\${API_URL} \\
                   --build-arg VITE_MASTER_KEY=\${MKEY:-MASTER-SMARTQUEUE-2024} \\
                   -t ${CUSTOMER_IMAGE}:${IMAGE_TAG} \\
                   -t ${CUSTOMER_IMAGE}:latest \\
@@ -87,11 +87,12 @@ pipeline {
         stage('restaurant-app') {
           steps {
             withCredentials([
-              string(credentialsId: 'MASTER_KEY', variable: 'MKEY')
+              string(credentialsId: 'API_GATEWAY_URL', variable: 'API_URL'),
+              string(credentialsId: 'MASTER_KEY',      variable: 'MKEY')
             ]) {
               sh """
                 docker build \\
-                  --build-arg VITE_API_URL=${API_GATEWAY_URL} \\
+                  --build-arg VITE_API_URL=\${API_URL} \\
                   --build-arg VITE_MASTER_KEY=\${MKEY:-MASTER-SMARTQUEUE-2024} \\
                   -t ${RESTAURANT_IMAGE}:${IMAGE_TAG} \\
                   -t ${RESTAURANT_IMAGE}:latest \\
@@ -171,7 +172,6 @@ pipeline {
         echo "--------------------------------------------"
         echo "customer-app   -> http://\${EC2_IP}:30174"
         echo "restaurant-app -> http://\${EC2_IP}:30175"
-        echo "API Gateway    -> ${API_GATEWAY_URL}"
         echo "============================================"
       """
     }
