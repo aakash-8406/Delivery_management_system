@@ -75,7 +75,7 @@ pipeline {
               sh """
                 docker build \\
                   --build-arg VITE_API_URL=${API_GATEWAY_URL} \\
-                  --build-arg VITE_MASTER_KEY=\${MKEY} \\
+                  --build-arg VITE_MASTER_KEY=\${MKEY:-MASTER-SMARTQUEUE-2024} \\
                   -t ${CUSTOMER_IMAGE}:${IMAGE_TAG} \\
                   -t ${CUSTOMER_IMAGE}:latest \\
                   ./deliver_management_system/customers-app
@@ -92,7 +92,7 @@ pipeline {
               sh """
                 docker build \\
                   --build-arg VITE_API_URL=${API_GATEWAY_URL} \\
-                  --build-arg VITE_MASTER_KEY=\${MKEY} \\
+                  --build-arg VITE_MASTER_KEY=\${MKEY:-MASTER-SMARTQUEUE-2024} \\
                   -t ${RESTAURANT_IMAGE}:${IMAGE_TAG} \\
                   -t ${RESTAURANT_IMAGE}:latest \\
                   ./deliver_management_system/restaurant-app

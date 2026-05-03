@@ -3,17 +3,19 @@
  * Real AWS API Gateway — custom Lambda auth (no Cognito).
  */
 
-const BASE = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
+const BASE       = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
+const MASTER_KEY = import.meta.env.VITE_MASTER_KEY ?? 'MASTER-SMARTQUEUE-2024';
 
 const getToken = () => localStorage.getItem('sq_token');
 
-const request = async (method, path, body) => {
+const request = async (method, path, body, extraHeaders = {}) => {
   const token = getToken();
   const res = await fetch(`${BASE}${path}`, {
     method,
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...extraHeaders,
     },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   });
@@ -24,7 +26,8 @@ const request = async (method, path, body) => {
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
-export const registerRestaurant = (data) => request('POST', '/register', data);
+export const registerRestaurant = (data) =>
+  request('POST', '/register', data, { 'x-master-key': MASTER_KEY });
 export const loginRestaurant    = (email, password) => request('POST', '/login', { email, password });
 
 // ─── Orders ──────────────────────────────────────────────────────────────────
