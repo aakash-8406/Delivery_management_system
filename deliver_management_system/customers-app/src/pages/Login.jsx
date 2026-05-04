@@ -80,8 +80,7 @@ const Login = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
-              <div>
+            {!isLogin && (              <div>
                 <label className="block text-sm font-medium mb-1.5">Full Name</label>
                 <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="John Doe"
                   className="w-full px-4 py-2.5 rounded-lg border border-[var(--input)] bg-[var(--card)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)] transition" />
@@ -133,9 +132,6 @@ const Login = () => {
             </button>
           </form>
 
-          <div className="mt-4 p-3 bg-[var(--secondary)] border border-[var(--border)] rounded-xl text-xs text-[var(--muted-foreground)] text-center">
-            Demo: <strong className="text-[var(--foreground)]">customer@bitrush.com</strong> / <strong className="text-[var(--foreground)]">customer123</strong>
-          </div>
         </div>
 
         <p className="text-center text-[var(--muted-foreground)] text-sm mt-5">
