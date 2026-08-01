@@ -29,30 +29,44 @@ pipeline {
           string(credentialsId: 'MASTER_KEY',            variable: 'MASTER_KEY')
         ]) {
           sh """
-            LAMBDA_DIR=deliver_management_system/infra/lambda
+            # Absolute path anchored to Jenkins workspace — never breaks across iterations
+            WORKSPACE_ROOT=\$(pwd)
+            LAMBDA_DIR=\${WORKSPACE_ROOT}/deliver_management_system/infra/lambda
             DB_HOST=smartqueue-mysql.cliwcewwcbhv.ap-southeast-1.rds.amazonaws.com
+
+            echo "=== Workspace: \${WORKSPACE_ROOT} ==="
+            echo "=== Lambda dir: \${LAMBDA_DIR} ==="
 
             for fn in getRestaurants getRestaurantById login register placeOrder getOrders updateOrder deleteRestaurant updateRestaurant customerRegister customerLogin getUploadUrl; do
               echo "--- Deploying \$fn ---"
-              cd \$LAMBDA_DIR/\$fn
-              npm install --omit=dev --silent
-              zip -r \${fn}.zip . -x "*.log" "package-lock.json"
-              aws lambda update-function-code \\
-                --function-name smartqueue-\$fn \\
-                --zip-file fileb://\${fn}.zip \\
-                --region \${AWS_DEFAULT_REGION} > /dev/null
-              aws lambda wait function-updated \\
-                --function-name smartqueue-\$fn \\
-                --region \${AWS_DEFAULT_REGION}
-              aws lambda update-function-configuration \\
-                --function-name smartqueue-\$fn \\
-                --environment "Variables={DB_HOST=\$DB_HOST,DB_PORT=3306,DB_NAME=smartqueue,DB_USER=admin,DB_PASSWORD=\${DB_PASSWORD},JWT_SECRET=smartqueue-secret,MASTER_KEY=\${MASTER_KEY},S3_BUCKET=smartqueue-images-948976368048}" \\
-                --region \${AWS_DEFAULT_REGION} > /dev/null
-              aws lambda wait function-updated \\
-                --function-name smartqueue-\$fn \\
-                --region \${AWS_DEFAULT_REGION}
-              rm \${fn}.zip
-              cd -
+              FN_DIR=\${LAMBDA_DIR}/\$fn
+
+              if [ ! -d "\${FN_DIR}" ]; then
+                echo "ERROR: Directory \${FN_DIR} not found — skipping"
+                continue
+              fi
+
+              # Run everything in a subshell so the working dir never drifts
+              (
+                cd "\${FN_DIR}"
+                npm install --omit=dev
+                zip -r \${fn}.zip . -x "*.log" "package-lock.json"
+                aws lambda update-function-code \\
+                  --function-name smartqueue-\$fn \\
+                  --zip-file fileb://\${fn}.zip \\
+                  --region \${AWS_DEFAULT_REGION} > /dev/null
+                aws lambda wait function-updated \\
+                  --function-name smartqueue-\$fn \\
+                  --region \${AWS_DEFAULT_REGION}
+                aws lambda update-function-configuration \\
+                  --function-name smartqueue-\$fn \\
+                  --environment "Variables={DB_HOST=\$DB_HOST,DB_PORT=3306,DB_NAME=smartqueue,DB_USER=admin,DB_PASSWORD=\${DB_PASSWORD},JWT_SECRET=smartqueue-secret,MASTER_KEY=\${MASTER_KEY},S3_BUCKET=smartqueue-images-948976368048}" \\
+                  --region \${AWS_DEFAULT_REGION} > /dev/null
+                aws lambda wait function-updated \\
+                  --function-name smartqueue-\$fn \\
+                  --region \${AWS_DEFAULT_REGION}
+                rm \${fn}.zip
+              )
             done
           """
         }
