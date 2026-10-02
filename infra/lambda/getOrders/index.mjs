@@ -5,7 +5,7 @@ const cors = {
   "Access-Control-Allow-Headers": "Content-Type,Authorization,x-master-key",
   "Content-Type": "application/json",
 };
-
+// comments are updated
 const getConn = () => mysql.createConnection({
   host: process.env.DB_HOST, port: Number(process.env.DB_PORT) || 3306,
   user: process.env.DB_USER, password: process.env.DB_PASSWORD,
